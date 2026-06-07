@@ -1,0 +1,10 @@
+{"question":"Redis 的 AOF 和 RDB 持久化有什么区别？","gold_doc_ids":["redis:persistence"],"expected_keywords":["AOF","RDB","快照","写命令"]}
+{"question":"Redis 中如何给 key 设置过期时间，TTL 的作用是什么？","gold_doc_ids":["redis:expiration"],"expected_keywords":["EXPIRE","TTL","过期时间","惰性删除"]}
+{"question":"Redis Stream 和 Pub/Sub 在可靠消费上有什么差异？","gold_doc_ids":["redis:streams","redis:pubsub"],"expected_keywords":["Stream","Pub/Sub","消费者组","消息历史"]}
+{"question":"Sorted Set 为什么适合做排行榜？","gold_doc_ids":["redis:sorted_sets"],"expected_keywords":["score","ZADD","排名","有序"]}
+{"question":"Redis Sentinel 主要解决什么问题？","gold_doc_ids":["redis:sentinel"],"expected_keywords":["监控","自动故障转移","主节点","副本"]}
+{"question":"Redis Cluster 是如何进行数据分片的？","gold_doc_ids":["redis:cluster"],"expected_keywords":["16384","hash slot","MOVED","分片"]}
+{"question":"WATCH 在 Redis 事务中起什么作用？","gold_doc_ids":["redis:transactions"],"expected_keywords":["WATCH","乐观锁","EXEC","修改"]}
+{"question":"Lua 脚本为什么适合库存扣减或限流？","gold_doc_ids":["redis:scripting"],"expected_keywords":["Lua","原子","EVAL","阻塞"]}
+{"question":"Redis 内存达到 maxmemory 后会发生什么？","gold_doc_ids":["redis:eviction"],"expected_keywords":["maxmemory","淘汰","LRU","LFU"]}
+{"question":"如何缓解缓存穿透、缓存击穿和缓存雪崩？","gold_doc_ids":["redis:cache_risks"],"expected_keywords":["布隆过滤器","互斥锁","随机 TTL","高可用"]}

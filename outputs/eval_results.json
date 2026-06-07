@@ -1,0 +1,89 @@
+{
+  "summary": {
+    "context_relevance": 1.0,
+    "faithfulness": 0.8116,
+    "answer_relevance": 0.875
+  },
+  "rows": [
+    {
+      "question": "Redis 的 AOF 和 RDB 持久化有什么区别？",
+      "context_relevance": 1.0,
+      "faithfulness": 0.8542,
+      "answer_relevance": 1.0,
+      "answer": "根据检索到的 Redis 文档，Redis 提供 RDB 和 AOF 两类持久化机制 实际生产中可以同时开启 RDB 和 AOF，在恢复速度和数据安全之间取得平衡 RDB 会在指定条件下生成某一时刻的数据快照，文件紧凑，适合备份和快速恢复，但两次快照之间的数据可能丢失 AOF 以追加日志记录写命令，通常能提供更好的数据安全性，可以配置 appendfsync always、everysec 或 no [1]。以上回答仅基于列出的知识库片段。",
+      "sources": "redis:persistence"
+    },
+    {
+      "question": "Redis 中如何给 key 设置过期时间，TTL 的作用是什么？",
+      "context_relevance": 1.0,
+      "faithfulness": 0.8303,
+      "answer_relevance": 1.0,
+      "answer": "根据检索到的 Redis 文档，Redis 可以为 key 设置过期时间 EXPIRE 设置秒级 TTL，PEXPIRE 设置毫秒级 TTL，TTL 查询剩余秒数，PERSIST 移除过期时间 合理设置 TTL 可以控制缓存生命周期，但大量 key 同时过期可能造成缓存雪崩 过期键会通过惰性删除和周期性删除清理：惰性删除在访问 key 时检查是否过期，周期性删除由 Redis 后台抽样清理 [1]。以上回答仅基于列出的知识库片段。",
+      "sources": "redis:expiration"
+    },
+    {
+      "question": "Redis Stream 和 Pub/Sub 在可靠消费上有什么差异？",
+      "context_relevance": 1.0,
+      "faithfulness": 0.8875,
+      "answer_relevance": 1.0,
+      "answer": "根据检索到的 Redis 文档，Stream 比 Pub/Sub 更适合需要可靠消费和消息历史的场景 Stream 是 Redis 的追加式日志数据结构，用于事件流、消息队列和日志管道 Consumer Group 允许多个消费者协同消费同一个 Stream，XREADGROUP 读取分配给消费者组的消息，XACK 用于确认消息已经处理 [1] 如果业务需要消息历史、确认机制或消费者组，应该优先考虑 Stream，而不是 Pub/Sub Pub/Sub 是 Redis 的发布订阅机制，PUBLISH 向频道发布消息，SUBSCRIBE 订阅频道 Pub/Sub 适合实时通知，但消息不会持久化，订阅者离线时会错过消息 [2]。以上回答仅基于列出的知识库片段。",
+      "sources": "redis:streams; redis:pubsub"
+    },
+    {
+      "question": "Sorted Set 为什么适合做排行榜？",
+      "context_relevance": 1.0,
+      "faithfulness": 0.825,
+      "answer_relevance": 0.5,
+      "answer": "根据检索到的 Redis 文档，Sorted Set 常用于排行榜、优先级队列、延迟队列和滑动窗口统计，因为它同时支持去重和有序访问 Sorted Set 是带 score 的集合，成员唯一但每个成员有一个分数 [1] Redis 是一个内存数据结构服务器，常用于缓存、会话存储、排行榜、消息队列、实时分析和向量检索场景 [2]。以上回答仅基于列出的知识库片段。",
+      "sources": "redis:sorted_sets; redis:overview"
+    },
+    {
+      "question": "Redis Sentinel 主要解决什么问题？",
+      "context_relevance": 1.0,
+      "faithfulness": 0.887,
+      "answer_relevance": 1.0,
+      "answer": "根据检索到的 Redis 文档，Redis Sentinel 提供监控、通知和自动故障转移能力 Sentinel 会持续检查主节点和副本节点是否可达，当多个 Sentinel 达成主观下线和客观下线判断后，可以选举一个副本提升为新的主节点，并通知客户端更新连接地址 Sentinel 适合主从复制架构下的高可用，但它不负责数据分片 [1] Redis Replication 用于把主节点的数据复制到一个或多个副本节点 Replication 本身不自动完成故障转移，通常需要 Sentinel 或 Cluster 配合实现高可用 [2]。以上回答仅基于列出的知识库片段。",
+      "sources": "redis:sentinel; redis:replication"
+    },
+    {
+      "question": "Redis Cluster 是如何进行数据分片的？",
+      "context_relevance": 1.0,
+      "faithfulness": 0.8509,
+      "answer_relevance": 0.75,
+      "answer": "根据检索到的 Redis 文档，Redis Cluster 通过 16384 个 hash slot 实现数据分片，每个 key 根据 CRC16 结果映射到一个 slot 不同节点负责不同 slot，因此 Cluster 可以横向扩展容量和吞吐 Cluster 支持节点故障检测和副本提升，但多 key 操作通常要求相关 key 位于同一个 hash slot [1] Sentinel 适合主从复制架构下的高可用，但它不负责数据分片 Redis Sentinel 提供监控、通知和自动故障转移能力 [2]。以上回答仅基于列出的知识库片段。",
+      "sources": "redis:cluster; redis:sentinel"
+    },
+    {
+      "question": "WATCH 在 Redis 事务中起什么作用？",
+      "context_relevance": 1.0,
+      "faithfulness": 0.8214,
+      "answer_relevance": 1.0,
+      "answer": "根据检索到的 Redis 文档，Redis Transaction 使用 MULTI 开启命令队列，EXEC 按顺序执行队列中的命令，DISCARD 放弃事务 Redis 事务保证单个 EXEC 中的命令连续执行，不会被其他客户端命令插入 WATCH 提供乐观锁能力：如果被监视的 key 在 EXEC 前被修改，事务会失败 Redis 事务不支持传统关系数据库中的回滚语义 [1]。以上回答仅基于列出的知识库片段。",
+      "sources": "redis:transactions"
+    },
+    {
+      "question": "Lua 脚本为什么适合库存扣减或限流？",
+      "context_relevance": 1.0,
+      "faithfulness": 0.8186,
+      "answer_relevance": 1.0,
+      "answer": "根据检索到的 Redis 文档，Lua 脚本适合库存扣减、限流、复杂条件更新等需要原子性的场景 Redis 支持使用 Lua 脚本把多步操作封装为一次原子执行 EVAL 执行脚本，EVALSHA 可以根据脚本 SHA1 调用已缓存脚本 脚本应该保持短小并避免长时间阻塞，因为 Redis 执行脚本时会占用事件循环 [1]。以上回答仅基于列出的知识库片段。",
+      "sources": "redis:scripting"
+    },
+    {
+      "question": "Redis 内存达到 maxmemory 后会发生什么？",
+      "context_relevance": 1.0,
+      "faithfulness": 0.4714,
+      "answer_relevance": 0.5,
+      "answer": "根据检索到的 Redis 文档，当 Redis 使用内存达到 maxmemory 限制时，会根据 maxmemory-policy 执行内存淘汰 [1]。以上回答仅基于列出的知识库片段。",
+      "sources": "redis:eviction"
+    },
+    {
+      "question": "如何缓解缓存穿透、缓存击穿和缓存雪崩？",
+      "context_relevance": 1.0,
+      "faithfulness": 0.8697,
+      "answer_relevance": 1.0,
+      "answer": "根据检索到的 Redis 文档，Redis 缓存系统常见风险包括缓存穿透、缓存击穿和缓存雪崩 缓存穿透指大量请求查询不存在的数据，可以通过布隆过滤器、空值缓存和参数校验缓解 缓存雪崩指大量 key 同时失效或 Redis 故障导致后端压力激增，可以通过随机 TTL、多级缓存、限流降级和高可用架构缓解 缓存击穿指热点 key 过期瞬间大量请求打到数据库，可以使用互斥锁、逻辑过期或提前刷新 [1]。以上回答仅基于列出的知识库片段。",
+      "sources": "redis:cache_risks"
+    }
+  ]
+}
