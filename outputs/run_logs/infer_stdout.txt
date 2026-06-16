@@ -9,4 +9,9 @@ Redis 的 AOF 和 RDB 持久化有什么区别？
 [1] Redis persistence with RDB and AOF (redis:persistence) score=1.0819
     https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/
 
+引用检查
+passed=True
+cited_indices=[1]
+missing_indices=[]
+
 索引目录: /Users/sun/deeplearning/nlp/data/index

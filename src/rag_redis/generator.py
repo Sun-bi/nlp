@@ -9,6 +9,7 @@ import urllib.request
 from dataclasses import dataclass
 from typing import List, Sequence
 
+from .citations import CitationCheck, check_citations
 from .retriever import RetrievalResult
 from .text import tokenize
 
@@ -25,6 +26,7 @@ class Source:
 class GeneratedAnswer:
     answer: str
     sources: List[Source]
+    citation_check: CitationCheck | None = None
 
 
 class ExtractiveGenerator:
@@ -77,7 +79,11 @@ class ExtractiveGenerator:
             + body
             + "。以上回答仅基于列出的知识库片段。"
         )
-        return GeneratedAnswer(answer=answer, sources=sources)
+        return GeneratedAnswer(
+            answer=answer,
+            sources=sources,
+            citation_check=check_citations(answer, grounded_contexts[:3]),
+        )
 
 
 class OpenAICompatibleGenerator:
@@ -142,7 +148,11 @@ class OpenAICompatibleGenerator:
             )
             for result in contexts[:5]
         ]
-        return GeneratedAnswer(answer=content, sources=sources)
+        return GeneratedAnswer(
+            answer=content,
+            sources=sources,
+            citation_check=check_citations(content, contexts[:5]),
+        )
 
 
 def _split_sentences(text: str) -> List[str]:

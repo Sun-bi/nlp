@@ -10,6 +10,19 @@ $ python3 infer.py --question Redis 的 AOF 和 RDB 持久化有什么区别？ 
       "score": 1.0819
     }
   ],
+  "citation_check": {
+    "has_citation": true,
+    "valid_indices": true,
+    "grounded": true,
+    "cited_indices": [
+      1
+    ],
+    "missing_indices": [],
+    "supported_indices": [
+      1
+    ],
+    "passed": true
+  },
   "retrieved_contexts": [
     {
       "doc_id": "redis:persistence",

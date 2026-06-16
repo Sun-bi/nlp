@@ -213,7 +213,8 @@ def create_architecture_photo():
         ("BM25\nIndex", 760, 335, TEAL),
         ("Hybrid\nRetriever", 980, 250, RED),
         ("Light\nReranker", 1190, 250, AMBER),
-        ("DeepSeek /\nFallback", 1390, 250, BLUE),
+        ("DeepSeek /\nFallback", 1385, 205, BLUE),
+        ("Citation\nCheck", 1385, 355, TEAL),
     ]
     for text, x, y, color in nodes:
         shadow_card(draw, (x, y, x + 165, y + 95), radius=22, fill="#FFFFFF", outline=color)
@@ -226,7 +227,8 @@ def create_architecture_photo():
         (925, 210, 980, 292),
         (925, 380, 980, 305),
         (1145, 298, 1190, 298),
-        (1355, 298, 1390, 298),
+        (1355, 298, 1385, 252),
+        (1355, 298, 1385, 400),
     ]
     for x1, y1, x2, y2 in arrows:
         draw.line((x1, y1, x2, y2), fill=RED, width=5)
@@ -236,7 +238,7 @@ def create_architecture_photo():
         draw.polygon([(x2, y2), p1, p2], fill=RED)
     shadow_card(draw, (250, 560, 1350, 720), radius=26, fill="#FFFFFF", outline="#DDE5EF")
     draw.text((300, 590), "高级策略", font=F_H2, fill=RED)
-    draw.text((300, 648), "Query Rewriting + Hybrid Retrieval + Lightweight Reranking + Context Filtering", font=F_BODY, fill=INK)
+    draw.text((300, 648), "Query Rewriting + Hybrid Retrieval + Reranking + Citation Checking", font=F_BODY, fill=INK)
     img.save(OUT / "architecture_flow.png")
 
 
@@ -314,12 +316,45 @@ def create_retrieval_scores(payload: dict):
     img.save(OUT / "retrieval_scores.png")
 
 
+def create_retrieval_comparison():
+    data = json.loads((ROOT / "outputs/retrieval_comparison.json").read_text(encoding="utf-8"))
+    rows = data["summary"]
+    img = Image.new("RGB", WIDE, BG)
+    draw = ImageDraw.Draw(img)
+    draw.text((70, 55), "检索策略消融对比", font=F_TITLE, fill=INK)
+    draw.text((72, 125), "compare_retrieval.py 真实运行输出：20 条问题，Top-k=5", font=F_BODY, fill=MUTED)
+    metrics = [
+        ("context_relevance", "Context"),
+        ("top1_hit", "Top-1"),
+        ("mrr", "MRR"),
+    ]
+    colors = [RED, TEAL, AMBER]
+    x0, y0 = 125, 230
+    group_h = 118
+    bar_w = 760
+    for row_idx, row in enumerate(rows):
+        y = y0 + row_idx * group_h
+        draw.text((x0, y + 18), row["strategy"], font=F_H2, fill=INK)
+        for col_idx, (key, label) in enumerate(metrics):
+            value = float(row[key])
+            bx = x0 + 380
+            by = y + col_idx * 32
+            draw.text((bx - 95, by), label, font=F_SMALL, fill=MUTED)
+            draw.rounded_rectangle((bx, by + 3, bx + bar_w, by + 25), radius=11, fill="#E5E7EB")
+            draw.rounded_rectangle((bx, by + 3, bx + int(bar_w * value), by + 25), radius=11, fill=colors[col_idx])
+            draw.text((bx + bar_w + 25, by - 1), f"{value:.4f}", font=F_SMALL, fill=INK)
+    shadow_card(draw, (125, 735, 1475, 825), radius=24, fill="#FFFFFF", outline="#DDE5EF")
+    draw.text((170, 762), "结论：pure vector 在命令密集场景下最弱；BM25 和 hybrid 更稳，rerank 提供可解释的最终排序字段。", font=F_BODY, fill=INK)
+    img.save(OUT / "retrieval_comparison.png")
+
+
 def main() -> None:
     question = "Redis 的 AOF 和 RDB 持久化有什么区别？"
     build_text = run_project_command(["build_index.py"], "build_index_stdout.txt")
     infer_text = run_project_command(["infer.py", "--question", question], "infer_stdout.txt")
     infer_payload = run_json_command(["infer.py", "--question", question, "--json"], "infer_json_stdout.txt")
     eval_text = run_project_command(["evaluate.py", "--rebuild"], "evaluate_stdout.txt")
+    run_project_command(["compare_retrieval.py", "--rebuild"], "retrieval_comparison_stdout.txt")
 
     create_hero()
     create_kb_overview()
@@ -328,6 +363,7 @@ def main() -> None:
     create_inference_result(infer_text)
     create_evaluation_chart(eval_text)
     create_retrieval_scores(infer_payload)
+    create_retrieval_comparison()
     print(OUT)
 
 

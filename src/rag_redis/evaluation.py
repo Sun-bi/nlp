@@ -75,6 +75,7 @@ def save_eval_outputs(
                 "answer_relevance",
                 "answer",
                 "sources",
+                "citation_passed",
             ],
         )
         writer.writeheader()

@@ -224,6 +224,7 @@ def add_figures(doc: Document) -> None:
         ("真实索引构建运行结果", ASSETS / "build_index_result.png"),
         ("真实一键推理运行结果", ASSETS / "inference_result.png"),
         ("三维量化评估结果与真实运行输出", ASSETS / "evaluation_results.png"),
+        ("检索策略消融对比结果", ASSETS / "retrieval_comparison.png"),
         ("检索命中文档与二阶段重排序分数", ASSETS / "retrieval_scores.png"),
     ]
     for caption, path in figures:

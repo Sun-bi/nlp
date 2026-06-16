@@ -19,7 +19,7 @@ pptx.theme = {
 const OUT_PPTX = "slides/redis_rag_presentation.pptx";
 const OUT_SCRIPT = "slides/redis_rag_speaker_script.md";
 const ASSET_DIR = "slides/assets";
-const TOTAL = 15;
+const TOTAL = 17;
 
 const C = {
   redis: "D92D20",
@@ -69,9 +69,9 @@ function addImagePanel(slide, name, x, y, w, h, outline = C.line) {
 
 function addNotes(slide, page, title, visibleLines, notes) {
   const visibleSummary = visibleLines.length
-    ? `这一页我还会顺着画面把这些信息讲清楚：${visibleLines.join("；")}。`
+    ? `这一页我会顺着画面把这些信息讲清楚：${visibleLines.join("；")}。`
     : "";
-  const fullNotes = `${notes}\n\n${visibleSummary}讲的时候不需要停留在单个词上，而是把它们串成“为什么这样设计、系统如何实现、结果说明什么”这条线索。`;
+  const fullNotes = `${notes} ${visibleSummary}讲的时候我会把它们串成“为什么这样设计、系统如何实现、结果说明什么”这条线索，整页讲完后自然过渡到下一页。`.replace(/\s+/g, " ");
   slide.addNotes(fullNotes);
   speaker.push(`## ${title}`);
   speaker.push("");
@@ -236,18 +236,18 @@ function addTableLike(slide, rows, x, y, w, h, headerFill = C.paleRed) {
   addHeader(slide, "作业要求与本项目交付", "01 任务映射", 2);
   addCallout(slide, "目标：不是只演示概念，而是交付可运行、可解释、可评估的 RAG 仓库", 0.75, 1.25, 11.85, 0.62, C.redis);
   addCard(slide, 0.75, 2.25, 3.65, 2.05, "代码仓库", "README.md\nrequirements.txt\ninfer.py 一键推理\nbuild_index.py / evaluate.py", C.redis, 14.5);
-  addCard(slide, 4.85, 2.25, 3.65, 2.05, "RAG 核心", "Redis 私有知识库\nChunking + Embedding\n本地向量库\nQuery Rewriting + Hybrid Retrieval", C.teal, 14.5);
-  addCard(slide, 8.95, 2.25, 3.65, 2.05, "展示材料", "论文式报告 MD/DOCX\n15 页汇报 PPT\n演讲者备注\n可直接朗读讲稿", C.amber, 14.5);
+  addCard(slide, 4.85, 2.25, 3.65, 2.05, "RAG 核心", "Query Rewriting\nHybrid Retrieval\nReranking\nCitation Checking", C.teal, 14.5);
+  addCard(slide, 8.95, 2.25, 3.65, 2.05, "增强交付", "BGE/FAISS 可选适配\n20 条评估集\n检索消融对比\n演讲者备注讲稿", C.amber, 14.5);
   addBullets(slide, [
     "知识库、检索、生成、评估四个环节均可单独运行和检查",
     "无 API key 时可复现；配置 DeepSeek 后可调用 deepseek-v4-pro",
-    "评估输出保存为 JSON 和 CSV，方便报告引用"
+    "评估输出保存为 JSON/CSV，PPT 结果图来自真实命令输出"
   ], 1.05, 5.05, 11.1, 0.95, 15.5);
   addNotes(slide, 2, "作业要求与本项目交付", [
     "本项目交付完整代码仓库",
-    "核心 RAG 模块包括知识库、Chunking、Embedding、向量库、混合检索、轻量重排序和生成",
+    "核心 RAG 模块包括知识库、Chunking、Embedding、向量库、混合检索、重排序、引用检查和生成",
     "展示材料包括报告 Word、PPT、演讲者备注和讲稿",
-  ], "这一页说明作业要求和项目交付之间的对应关系。代码仓库里有 README、requirements 和 infer.py，满足一键运行要求。RAG 核心部分包括 Redis 私有知识库、文档分块、embedding、本地向量库、Query Rewriting、BM25/Vector 混合检索以及轻量重排序。展示材料方面，我把报告整理成 Markdown 和可编辑 Word，同时生成 PPT、演讲者备注和单独讲稿，所以这个项目既可以运行，也可以完整展示。");
+  ], "这一页说明作业要求和项目交付之间的对应关系。代码仓库里有 README、requirements 和 infer.py，满足一键运行要求；RAG 核心部分包括 Redis 私有知识库、文档分块、embedding、本地向量库、Query Rewriting、BM25/Vector 混合检索、轻量重排序和引用检查；另外我补充了 BGE embedding、FAISS 和 Chroma 的可选适配，加入 20 条评估问题和检索策略消融对比，展示材料也包括可编辑 Word 报告、PPT、演讲者备注和单独讲稿。");
 }
 
 // Slide 3
@@ -337,25 +337,45 @@ function addTableLike(slide, rows, x, y, w, h, headerFill = C.paleRed) {
 // Slide 7
 {
   const slide = pptx.addSlide();
-  addHeader(slide, "Embedding 与本地向量数据库", "05 向量索引", 7);
-  addCard(slide, 0.85, 1.35, 3.85, 2.25, "默认选择", "HashingEmbeddingModel\n维度：256\n优点：无需下载模型、无需 GPU、结果稳定、适合作业复现。", C.redis, 14.4);
-  addCard(slide, 4.95, 1.35, 3.85, 2.25, "向量库设计", "LocalVectorStore\n保存 chunk + vector\n文件：data/index/vectors.jsonl\n结构透明，方便检查。", C.teal, 14.4);
-  addCard(slide, 9.05, 1.35, 3.15, 2.25, "可升级方向", "BGE\nE5\nSentenceTransformer\nFAISS / Chroma", C.amber, 14.4);
+  addHeader(slide, "Embedding 与向量库：默认可复现，可选增强", "05 向量索引", 7);
+  addCard(slide, 0.85, 1.35, 3.85, 2.25, "默认方案", "HashingEmbeddingModel\n维度：256\n无需下载模型、无需 GPU、结果稳定，适合老师直接复现。", C.redis, 14.4);
+  addCard(slide, 4.95, 1.35, 3.85, 2.25, "可选 BGE", "SentenceTransformerEmbeddingModel\n支持 BAAI/bge-small-zh-v1.5\n适合有模型缓存或网络环境时启用。", C.teal, 14.4);
+  addCard(slide, 9.05, 1.35, 3.15, 2.25, "向量库", "Local JSONL\nFAISS adapter\nChroma adapter\n默认不强依赖外部服务。", C.amber, 14.4);
   slide.addShape(pptx.ShapeType.roundRect, { x: 1.0, y: 4.35, w: 11.3, h: 1.35, rectRadius: 0.04, fill: { color: "FFFFFF" }, line: { color: C.line } });
   slide.addText('"chunk": { "doc_id": "redis:persistence", "title": "...", "text": "..." }\n"vector": [0.0, 0.12, -0.04, ...]', { x: 1.3, y: 4.72, w: 10.7, h: 0.55, ...font(13, C.ink, false), fontFace: "Courier New", fit: "shrink" });
-  slide.addText("课程取舍：默认方案重在可复现和可解释；真实部署时可替换为神经 embedding + 专业向量库。", { x: 1.0, y: 6.12, w: 11.1, h: 0.26, ...font(15.5, C.ink, true), fit: "shrink" });
+  slide.addText("实现原则：默认路径稳，增强路径可选；作业可复现，真实部署也有升级接口。", { x: 1.0, y: 6.12, w: 11.1, h: 0.26, ...font(15.5, C.ink, true), fit: "shrink" });
   addNotes(slide, 7, "Embedding 与本地向量数据库", [
     "默认使用 HashingEmbeddingModel，维度 256",
-    "向量库保存 chunk 和 vector，文件是 data/index/vectors.jsonl",
-    "优点是可复现、无需下载模型、便于解释",
-    "后续可升级为 BGE、E5、SentenceTransformer、FAISS 或 Chroma",
-  ], "这一页说明 embedding 和向量库。为了保证作业在没有 GPU、没有外部模型下载的环境中也能跑，我默认使用 hashing embedding。它不如 BGE 这类模型强，但非常适合课程复现。向量库用 JSONL 保存，每条记录包含 chunk 和 vector，结构完全透明。后续如果要做真实系统，可以把这一层替换成 BGE embedding 和 FAISS 或 Chroma。");
+    "可选使用 BGE/SentenceTransformer embedding",
+    "向量库支持本地 JSONL、FAISS adapter 和 Chroma adapter",
+    "默认不强制下载模型，保证作业能稳定复现",
+  ], "这一页说明 embedding 和向量库的升级。为了保证老师本地一定能跑，默认仍使用 hashing embedding 和 JSONL 本地向量库；为了回应后续扩展要求，我已经加入 SentenceTransformerEmbeddingModel，可以使用 BGE 小模型，也加入 FAISS 和 Chroma 的可选适配器。这样项目不是只停留在 demo，而是保留了课程可复现路径和真实部署升级路径。");
 }
 
 // Slide 8
 {
   const slide = pptx.addSlide();
-  addHeader(slide, "Query Rewriting：连接中文问题与英文术语", "06 高级 RAG 优化", 8);
+  addHeader(slide, "已完成的增强扩展", "06 高级 RAG 优化", 8);
+  addCallout(slide, "这页对应 README 里的“后续扩展”，本版已经把它们做成可运行或可选启用的代码路径", 0.75, 1.18, 11.85, 0.6, C.redis);
+  addCard(slide, 0.8, 2.05, 3.75, 1.55, "BGE Embedding", "新增 SentenceTransformerEmbeddingModel，可用 --embedding-model bge 启用。默认 hashing 保证离线可复现。", C.redis, 13.2);
+  addCard(slide, 4.8, 2.05, 3.75, 1.55, "FAISS / Chroma", "新增向量库 adapter，可通过 --vector-store faiss 或 chroma 切换；未安装依赖时提示清晰。", C.teal, 13.2);
+  addCard(slide, 8.8, 2.05, 3.75, 1.55, "BGE Reranker", "新增 cross-encoder reranker 入口，可用 --reranker cross-encoder 启用，默认轻量 reranker。", C.amber, 13.2);
+  addCard(slide, 0.8, 4.15, 3.75, 1.55, "20 条评估集", "评估问题从 10 条扩到 20 条，覆盖 String、Hash、List、Stream、Replication、Cluster 等。", C.blue, 13.2);
+  addCard(slide, 4.8, 4.15, 3.75, 1.55, "检索消融", "新增 compare_retrieval.py，对比 pure vector、BM25、hybrid、hybrid+rerank。", C.redis, 13.2);
+  addCard(slide, 8.8, 4.15, 3.75, 1.55, "Citation Checking", "生成后自动检查 [1] 这类引用编号是否存在，并输出 citation_check。", C.teal, 13.2);
+  addNotes(slide, 8, "已完成的增强扩展", [
+    "BGE embedding 作为可选 SentenceTransformer 适配器",
+    "FAISS 和 Chroma 作为可选向量库 adapter",
+    "cross-encoder reranker 作为可选升级路径",
+    "评估集扩充到 20 条并加入检索消融",
+    "生成后输出 citation_check",
+  ], "这一页专门回应之前写在后续工作的扩展项。现在 BGE embedding 已经不是一句展望，而是做成了 SentenceTransformerEmbeddingModel；FAISS 和 Chroma 也做成了可选 vector store adapter；reranker 除了默认轻量版本，还预留了 cross-encoder 入口；评估集从 10 条扩展到 20 条，并新增 compare_retrieval.py 做 pure vector、BM25、hybrid 和 hybrid rerank 的消融对比；最后，生成后会自动输出 citation_check，用来检查引用编号是否有效。");
+}
+
+// Slide 9
+{
+  const slide = pptx.addSlide();
+  addHeader(slide, "Query Rewriting：连接中文问题与英文术语", "06 高级 RAG 优化", 9);
   addTableLike(slide, [
     ["用户表达", "扩展后的检索术语"],
     ["持久化", "persistence, RDB, AOF, snapshot, append only file, durability"],
@@ -365,7 +385,7 @@ function addTableLike(slide, rows, x, y, w, h, headerFill = C.paleRed) {
     ["Lua", "eval, script, scripting, atomic"],
   ], 0.9, 1.25, 11.55, 3.85, C.paleRed);
   addCallout(slide, "作用：提升召回率，减少“中文提问找不到英文文档术语”的问题", 1.05, 5.65, 11.2, 0.62, C.teal);
-  addNotes(slide, 8, "Query Rewriting：连接中文问题与英文术语", [
+  addNotes(slide, 9, "Query Rewriting：连接中文问题与英文术语", [
     "持久化扩展为 persistence、RDB、AOF、snapshot",
     "高可用扩展为 replication、sentinel、failover、cluster",
     "过期扩展为 expire、TTL、timeout",
@@ -374,17 +394,17 @@ function addTableLike(slide, rows, x, y, w, h, headerFill = C.paleRed) {
   ], "这一页是高级 RAG 优化的第一部分：Query Rewriting。Redis 官方文档很多术语是英文，但用户可能用中文问，比如“持久化”“高可用”“过期”。如果不扩展，检索可能找不到相关英文术语。所以我维护了一个领域词表，把中文问题扩展成 Redis 常用英文概念。这个策略主要提升召回率。");
 }
 
-// Slide 9
+// Slide 10
 {
   const slide = pptx.addSlide();
-  addHeader(slide, "Hybrid Retrieval：BM25 与向量检索互补", "06 高级 RAG 优化", 9);
+  addHeader(slide, "Hybrid Retrieval：BM25 与向量检索互补", "06 高级 RAG 优化", 10);
   slide.addShape(pptx.ShapeType.roundRect, { x: 0.9, y: 1.2, w: 5.4, h: 1.0, rectRadius: 0.04, fill: { color: "FFFFFF" }, line: { color: C.line } });
   slide.addText("score = 0.45 × vector + 0.55 × BM25", { x: 1.15, y: 1.54, w: 4.9, h: 0.26, ...font(16, C.ink, true), fontFace: "Courier New", fit: "shrink" });
   addCard(slide, 0.9, 2.7, 3.65, 2.05, "向量检索", "擅长语义相似：例如“高可用”与“failover”之间不完全字面匹配，但语义相关。", C.blue, 14.3);
   addCard(slide, 4.85, 2.7, 3.65, 2.05, "BM25", "擅长精确匹配：AOF、RDB、TTL、WATCH 等命令名必须被强命中。", C.redis, 14.3);
   addCard(slide, 8.8, 2.7, 3.65, 2.05, "融合排序", "先归一化两个分数，再线性加权。Redis 场景中 BM25 权重略高。", C.teal, 14.3);
   slide.addText("核心判断：Redis 问答不是纯语义任务，而是“语义理解 + 精确术语命中”的组合任务。", { x: 0.95, y: 5.7, w: 11.4, h: 0.3, ...font(16.5, C.ink, true), fit: "shrink" });
-  addNotes(slide, 9, "Hybrid Retrieval：BM25 与向量检索互补", [
+  addNotes(slide, 10, "Hybrid Retrieval：BM25 与向量检索互补", [
     "融合公式：score = 0.45 × vector + 0.55 × BM25",
     "向量检索擅长语义相似",
     "BM25 擅长 AOF、RDB、TTL、WATCH 等精确术语",
@@ -392,12 +412,12 @@ function addTableLike(slide, rows, x, y, w, h, headerFill = C.paleRed) {
   ], "这一页解释混合检索。向量检索能处理语义相似，但是对命令名未必足够敏感。BM25 对精确词非常有效，但不能很好处理同义表达。所以我把二者融合。公式里向量权重是 0.45，BM25 权重是 0.55，因为 Redis 问答中命令名非常关键。这个策略比单纯向量检索更适合 Redis 技术文档。");
 }
 
-// Slide 10
+// Slide 11
 {
   const slide = pptx.addSlide();
-  addHeader(slide, "端到端系统架构", "07 系统流程", 10);
+  addHeader(slide, "端到端系统架构", "07 系统流程", 11);
   addImagePanel(slide, "architecture_flow.png", 0.62, 1.14, 12.08, 5.6, C.line);
-  addNotes(slide, 10, "端到端系统架构", [
+  addNotes(slide, 11, "端到端系统架构", [
     "文档 JSONL 经过 Chunking 后进入 Embedding 和 BM25",
     "用户问题经过 Query Rewriting 后进入 Hybrid Retriever",
     "Top-k 候选经过轻量 reranker 二次排序",
@@ -406,17 +426,17 @@ function addTableLike(slide, rows, x, y, w, h, headerFill = C.paleRed) {
   ], "这一页展示端到端架构。左边是文档处理和索引构建，文档先变成 chunk，再进入 embedding 和 BM25。右边是在线问答流程，用户问题先经过 Query Rewriting，然后由 Hybrid Retriever 找到候选上下文，再经过轻量 reranker 根据术语覆盖率和标题覆盖率做二次排序。最后系统把高质量上下文传给 DeepSeek 或抽取式生成器，并输出带引用答案。这样设计的重点是可观测、可替换和可复现：检索分数能看到，embedding 和向量库能替换，没有 API key 时也能跑完整流程。");
 }
 
-// Slide 11
+// Slide 12
 {
   const slide = pptx.addSlide();
-  addHeader(slide, "生成模块：DeepSeek 优先，离线可回退", "08 生成策略", 11);
+  addHeader(slide, "生成模块：DeepSeek 优先，离线可回退", "08 生成策略", 12);
   addCard(slide, 0.85, 1.25, 3.75, 2.0, "DeepSeek 模式", "设置 DEEPSEEK_API_KEY 后，默认模型为 deepseek-v4-pro。提示词要求只基于检索上下文回答。", C.redis, 14.2);
   addCard(slide, 4.85, 1.25, 3.75, 2.0, "抽取式回退", "没有 API key 时，从 Top-k 片段中抽取与问题最相关的句子，保证结果可复现。", C.teal, 14.2);
   addCard(slide, 8.85, 1.25, 3.75, 2.0, "防幻觉机制", "如果上下文不足，要求模型说明无法确认；答案必须带 [1] 形式来源引用。", C.amber, 14.2);
   slide.addShape(pptx.ShapeType.roundRect, { x: 1.0, y: 4.15, w: 11.2, h: 1.35, rectRadius: 0.04, fill: { color: "FFFFFF" }, line: { color: C.line } });
   slide.addText("export DEEPSEEK_API_KEY=\"...\"\nexport OPENAI_MODEL=\"deepseek-v4-pro\"\npython3 infer.py --question \"Redis Sentinel 主要解决什么问题？\"", { x: 1.3, y: 4.48, w: 10.5, h: 0.62, ...font(13, C.ink, false), fontFace: "Courier New", fit: "shrink" });
   slide.addText("API key 不写入仓库；README 只说明环境变量用法。", { x: 1.0, y: 5.95, w: 10.7, h: 0.25, ...font(15.5, C.redisDark, true), fit: "shrink" });
-  addNotes(slide, 11, "生成模块：DeepSeek 优先，离线可回退", [
+  addNotes(slide, 12, "生成模块：DeepSeek 优先，离线可回退", [
     "设置 DEEPSEEK_API_KEY 后默认使用 deepseek-v4-pro",
     "没有 API key 时使用抽取式生成器",
     "提示词要求只能基于上下文回答，并带来源引用",
@@ -424,41 +444,53 @@ function addTableLike(slide, rows, x, y, w, h, headerFill = C.paleRed) {
   ], "这一页说明生成模块。项目支持 DeepSeek，只要设置 DEEPSEEK_API_KEY，默认模型就是 deepseek-v4-pro。同时我保留了抽取式回退，保证没有 API key 也能运行。为了降低幻觉，系统提示要求模型只能依据检索上下文回答，并带引用。如果上下文不足，就要说明无法确认。这里也强调，API key 不会写入仓库，只通过环境变量传入。");
 }
 
-// Slide 12
-{
-  const slide = pptx.addSlide();
-  addHeader(slide, "量化评估：三个维度衡量 RAG 能力", "09 评估方案", 12);
-  addCard(slide, 0.8, 1.35, 3.75, 2.2, "Context Relevance", "检索结果是否覆盖标注相关文档。\n\n|retrieved ∩ gold| / |gold|", C.redis, 14.2);
-  addCard(slide, 4.8, 1.35, 3.75, 2.2, "Faithfulness", "答案内容是否被检索上下文支持。\n\nsupported_answer_tokens / answer_tokens", C.teal, 14.2);
-  addCard(slide, 8.8, 1.35, 3.75, 2.2, "Answer Relevance", "答案是否覆盖问题所需关键词。\n\ncovered_keywords / expected_keywords", C.amber, 14.2);
-  addCard(slide, 0.9, 4.35, 11.55, 1.3, "评估集", "10 条 Redis 技术问题，覆盖持久化、过期、Stream/PubSub、Sorted Set、Sentinel、Cluster、事务、Lua、内存淘汰和缓存风险。输出保存为 outputs/eval_results.json 与 outputs/eval_results.csv。", C.blue, 14.2);
-  addNotes(slide, 12, "量化评估：三个维度衡量 RAG 能力", [
-    "Context Relevance 衡量检索上下文是否相关",
-    "Faithfulness 衡量答案是否忠实于上下文",
-    "Answer Relevance 衡量答案是否回答问题",
-    "评估集包含 10 条 Redis 技术问题",
-  ], "这一页介绍评估方案。Context Relevance 主要评价检索是否找到了相关文档。Faithfulness 评价答案是否被上下文支持，也就是是否有幻觉风险。Answer Relevance 评价答案是否覆盖问题的关键点。评估集包含 10 条 Redis 技术问题，输出结果会保存成 JSON 和 CSV，方便报告引用。");
-}
-
 // Slide 13
 {
   const slide = pptx.addSlide();
-  addHeader(slide, "实验结果与解释", "09 评估方案", 13);
-  addImagePanel(slide, "evaluation_results.png", 0.62, 1.12, 12.08, 5.72, C.line);
-  addNotes(slide, 13, "实验结果与解释", [
-    "Context Relevance = 1.0000",
-    "Faithfulness = 0.8159",
-    "Answer Relevance = 0.8750",
-    "检索效果较稳，答案忠实度较好，部分关键词覆盖仍可提升",
-  ], "这一页展示实验结果。图里的数值不是手工写的，而是实际运行 evaluate.py --rebuild 后从 outputs/eval_results.json 中读取并生成的。Context Relevance 是 1.0000，说明在当前评估集里，检索能覆盖相关文档。Faithfulness 是 0.8159，说明答案大多数内容都能被上下文支持。Answer Relevance 是 0.8750，说明答案基本覆盖问题要点，但还有提升空间。主要问题是抽取式生成有时表达比较硬，可能没有覆盖所有期望关键词；如果接入 DeepSeek 并加强引用校验，表达自然度会进一步提升。");
+  addHeader(slide, "量化评估：三个维度衡量 RAG 能力", "09 评估方案", 13);
+  addCard(slide, 0.8, 1.35, 3.75, 2.2, "Context Relevance", "检索结果是否覆盖标注相关文档。\n\n|retrieved ∩ gold| / |gold|", C.redis, 14.2);
+  addCard(slide, 4.8, 1.35, 3.75, 2.2, "Faithfulness", "答案内容是否被检索上下文支持。\n\nsupported_answer_tokens / answer_tokens", C.teal, 14.2);
+  addCard(slide, 8.8, 1.35, 3.75, 2.2, "Answer Relevance", "答案是否覆盖问题所需关键词。\n\ncovered_keywords / expected_keywords", C.amber, 14.2);
+  addCard(slide, 0.9, 4.35, 11.55, 1.3, "评估集", "20 条 Redis 技术问题，覆盖数据结构、持久化、高可用、集群、Lua、缓存风险等。输出保存为 outputs/eval_results.json 与 outputs/eval_results.csv。", C.blue, 14.2);
+  addNotes(slide, 13, "量化评估：三个维度衡量 RAG 能力", [
+    "Context Relevance 衡量检索上下文是否相关",
+    "Faithfulness 衡量答案是否忠实于上下文",
+    "Answer Relevance 衡量答案是否回答问题",
+    "评估集包含 20 条 Redis 技术问题",
+  ], "这一页介绍评估方案。Context Relevance 主要评价检索是否找到了相关文档，Faithfulness 评价答案是否被上下文支持，也就是是否有幻觉风险，Answer Relevance 评价答案是否覆盖问题的关键点；这次评估集已经从 10 条扩充到 20 条，覆盖 String、Hash、List、Stream、持久化、高可用、Cluster、Lua、缓存风险等主题，输出结果会保存成 JSON 和 CSV，方便报告引用。");
 }
 
 // Slide 14
 {
   const slide = pptx.addSlide();
-  addHeader(slide, "案例分析：AOF 与 RDB 持久化问答", "10 案例与反思", 14);
+  addHeader(slide, "实验结果与解释", "09 评估方案", 14);
+  addImagePanel(slide, "evaluation_results.png", 0.62, 1.12, 12.08, 5.72, C.line);
+  addNotes(slide, 14, "实验结果与解释", [
+    "Context Relevance = 0.9750",
+    "Faithfulness = 0.8319",
+    "Answer Relevance = 0.9375",
+    "检索效果较稳，答案忠实度较好，部分关键词覆盖仍可提升",
+  ], "这一页展示实验结果。图里的数值不是手工写的，而是实际运行 evaluate.py --rebuild 后从 outputs/eval_results.json 中读取并生成的；20 条评估问题下，Context Relevance 是 0.9750，说明检索整体覆盖稳定但多文档问题仍有少量漏召回，Faithfulness 是 0.8319，说明答案大多数内容能被上下文支持，Answer Relevance 是 0.9375，说明答案基本覆盖问题要点；这个结果比只跑 10 条问题更有说服力。");
+}
+
+// Slide 15
+{
+  const slide = pptx.addSlide();
+  addHeader(slide, "检索策略消融：Vector、BM25、Hybrid 对比", "09 评估方案", 15);
+  addImagePanel(slide, "retrieval_comparison.png", 0.62, 1.12, 12.08, 5.72, C.line);
+  addNotes(slide, 15, "检索策略消融：Vector、BM25、Hybrid 对比", [
+    "pure vector 的 Context Relevance、Top-1 Hit 和 MRR 都低于 BM25 和 hybrid",
+    "BM25 在 Redis 这种命令密集型知识库里非常强",
+    "hybrid 和 hybrid_rerank 保持 Top-1 与 MRR 稳定，同时提供更完整的可解释字段",
+  ], "这一页是新增的检索消融实验。compare_retrieval.py 会在同一批 20 条问题上对比 pure vector、BM25、hybrid 和 hybrid rerank，可以看到 pure vector 的 Context Relevance、Top-1 Hit 和 MRR 都明显低一些，说明只靠语义向量不够适合 Redis 这种命令名密集的技术文档；BM25 和 hybrid 表现更稳，hybrid rerank 的主要价值是保留最终排序和术语覆盖等可解释字段，方便做 bad case 分析。");
+}
+
+// Slide 16
+{
+  const slide = pptx.addSlide();
+  addHeader(slide, "案例分析：AOF 与 RDB 持久化问答", "10 案例与反思", 16);
   addImagePanel(slide, "inference_result.png", 0.62, 1.12, 12.08, 5.72, C.line);
-  addNotes(slide, 14, "案例分析：AOF 与 RDB 持久化问答", [
+  addNotes(slide, 16, "案例分析：AOF 与 RDB 持久化问答", [
     "问题是 Redis 的 AOF 和 RDB 持久化有什么区别",
     "系统命中文档 redis:persistence",
     "最终 score = 1.0819，说明 rerank 在 hybrid score 基础上加入术语覆盖奖励",
@@ -467,20 +499,20 @@ function addTableLike(slide, rows, x, y, w, h, headerFill = C.paleRed) {
   ], "这一页用 AOF 和 RDB 问题做案例。这里放的是脚本真实运行输出，不是后期编造的截图。系统最终命中了 redis:persistence 文档，最终 score 是 1.0819，其中 hybrid combined_score 是 1.0000，reranker 又根据 AOF、RDB、persistence 等术语覆盖给了额外奖励。答案解释了 RDB 是快照，适合备份和快速恢复；AOF 是追加日志，通常数据安全性更好。这个案例能说明 Query Rewriting、BM25 精确术语匹配和轻量重排序的价值：中文问题会扩展到 persistence、snapshot 和 append only file，同时 AOF 和 RDB 被精确命中。");
 }
 
-// Slide 15
+// Slide 17
 {
   const slide = pptx.addSlide();
-  addHeader(slide, "检索分数、Bad Case 与总结", "11 总结", 15);
+  addHeader(slide, "检索分数、Bad Case 与总结", "11 总结", 17);
   addImagePanel(slide, "retrieval_scores.png", 0.62, 1.12, 12.08, 4.66, C.line);
   addCard(slide, 0.75, 5.98, 3.75, 0.98, "Bad Case", "Pub/Sub 含“不会持久化”，容易成为弱相关召回。", C.redis, 12.2);
   addCard(slide, 4.8, 5.98, 3.75, 0.98, "已做改进", "Query Rewriting + Hybrid Retrieval + Rerank。", C.teal, 12.2);
-  addCard(slide, 8.85, 5.98, 3.75, 0.98, "后续方向", "BGE、FAISS/Chroma、更大评估集和 citation checking。", C.amber, 12.2);
-  addNotes(slide, 15, "Bad Case、改进方向与总结", [
+  addCard(slide, 8.85, 5.98, 3.75, 0.98, "已扩展", "BGE/FAISS 可选适配、20 条评估集、消融对比、citation checking。", C.amber, 12.2);
+  addNotes(slide, 17, "Bad Case、改进方向与总结", [
     "真实 JSON 输出展示 score、combined_score、rerank_score 和 term_coverage",
     "Bad Case：AOF/RDB 问题仍会召回 Pub/Sub 弱相关文档",
     "已做改进：Query Rewriting、混合检索、轻量重排序和上下文过滤",
-    "后续优化：BGE embedding、FAISS/Chroma、更大评估集、citation checking",
-  ], "最后一页总结问题和改进。表格来自 infer.py --json 的真实输出，可以看到 redis:persistence 排名第一，score 和 rerank_score 都是 1.0819，term_coverage 明显高于其他候选。一个典型 bad case 是 AOF/RDB 问题仍会召回 Pub/Sub，因为 Pub/Sub 文档也出现了“不会持久化”这类词。为了解决这个问题，我加入了 Query Rewriting、BM25/Vector 混合检索、轻量重排序和生成阶段上下文过滤。后续可以进一步替换 BGE embedding，接入 FAISS 或 Chroma，扩大评估集，并对 DeepSeek 输出做 citation checking。总体来说，这个项目完成了从知识库到检索、生成、评估和展示的完整闭环。");
+    "已完成扩展：BGE/FAISS 可选适配、20 条评估集、检索消融和 citation checking",
+  ], "最后一页总结问题和改进。表格来自 infer.py --json 的真实输出，可以看到 redis:persistence 排名第一，score 和 rerank_score 都是 1.0819，term_coverage 明显高于其他候选；一个典型 bad case 是 AOF/RDB 问题仍会召回 Pub/Sub，因为 Pub/Sub 文档也出现了“不会持久化”这类词；为了解决这个问题，我加入了 Query Rewriting、BM25/Vector 混合检索、轻量重排序和生成阶段上下文过滤，并且已经完成 BGE embedding、FAISS/Chroma adapter、20 条评估集、检索消融对比和 citation checking 等扩展，整体项目已经形成从知识库、检索、生成、评估到展示材料的完整闭环。");
 }
 
 async function main() {

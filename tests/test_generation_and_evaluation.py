@@ -1,4 +1,5 @@
 from rag_redis.chunking import Chunk
+from rag_redis.citations import check_citations
 from rag_redis.evaluation import evaluate_single
 from rag_redis.generator import ExtractiveGenerator, OpenAICompatibleGenerator
 from rag_redis.retriever import RetrievalResult
@@ -37,6 +38,8 @@ def test_extractive_generator_cites_sources_and_uses_retrieved_context():
     assert "RDB" in answer.answer
     assert "[1]" in answer.answer
     assert answer.sources[0].doc_id == "redis:persistence"
+    assert answer.citation_check is not None
+    assert answer.citation_check.passed
 
 
 def test_evaluate_single_scores_context_faithfulness_and_answer_relevance():
@@ -71,3 +74,18 @@ def test_deepseek_environment_defaults_are_openai_compatible(monkeypatch):
 
     assert generator.base_url == "https://api.deepseek.com"
     assert generator.model == "deepseek-v4-pro"
+
+
+def test_citation_checker_flags_missing_source_indices():
+    contexts = [
+        _result(
+            "redis:persistence",
+            "Redis persistence",
+            "AOF records write operations. RDB creates snapshots.",
+        )
+    ]
+
+    check = check_citations("AOF records write operations. [2]", contexts)
+
+    assert not check.passed
+    assert check.missing_indices == [2]

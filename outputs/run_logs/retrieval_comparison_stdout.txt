@@ -1,0 +1,7 @@
+$ python3 compare_retrieval.py --rebuild
+Redis RAG retrieval comparison
+pure_vector: Context=0.8750, Top1=0.8000, MRR=0.8267
+bm25: Context=1.0000, Top1=1.0000, MRR=1.0000
+hybrid: Context=0.9750, Top1=1.0000, MRR=1.0000
+hybrid_rerank: Context=0.9750, Top1=1.0000, MRR=1.0000
+Saved outputs to: outputs

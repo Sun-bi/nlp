@@ -20,6 +20,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--chunk-size", type=int, default=320, help="Chunk size in tokens")
     parser.add_argument("--overlap", type=int, default=40, help="Chunk overlap in tokens")
     parser.add_argument("--dimensions", type=int, default=256, help="Hashing embedding dimensions")
+    parser.add_argument("--embedding-model", default="hashing", help="hashing, bge, or a SentenceTransformer model")
+    parser.add_argument("--vector-store", default="local", choices=["local", "faiss", "chroma"], help="Vector store backend")
     return parser.parse_args()
 
 
@@ -31,10 +33,14 @@ def main() -> None:
         chunk_size=args.chunk_size,
         overlap=args.overlap,
         dimensions=args.dimensions,
+        embedding_model=args.embedding_model,
+        vector_store=args.vector_store,
     )
     print(f"Built Redis RAG index")
     print(f"Corpus: {Path(args.corpus).resolve()}")
     print(f"Index: {Path(args.index_dir).resolve()}")
+    print(f"Embedding: {args.embedding_model}")
+    print(f"Vector store: {args.vector_store}")
     print(f"Chunks: {len(chunks)}")
 
 

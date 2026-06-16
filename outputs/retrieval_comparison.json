@@ -1,0 +1,750 @@
+{
+  "summary": [
+    {
+      "strategy": "pure_vector",
+      "context_relevance": 0.875,
+      "top1_hit": 0.8,
+      "mrr": 0.8267
+    },
+    {
+      "strategy": "bm25",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "mrr": 1.0
+    },
+    {
+      "strategy": "hybrid",
+      "context_relevance": 0.975,
+      "top1_hit": 1.0,
+      "mrr": 1.0
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "context_relevance": 0.975,
+      "top1_hit": 1.0,
+      "mrr": 1.0
+    }
+  ],
+  "rows": [
+    {
+      "strategy": "pure_vector",
+      "question": "Redis 的 AOF 和 RDB 持久化有什么区别？",
+      "top1": "redis:persistence",
+      "retrieved": "redis:persistence; redis:pubsub; redis:overview; redis:sentinel; redis:hashes",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "pure_vector",
+      "question": "Redis 中如何给 key 设置过期时间，TTL 的作用是什么？",
+      "top1": "redis:expiration",
+      "retrieved": "redis:expiration; redis:scripting; redis:eviction; redis:cache_risks; redis:strings",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "pure_vector",
+      "question": "Redis Stream 和 Pub/Sub 在可靠消费上有什么差异？",
+      "top1": "redis:streams",
+      "retrieved": "redis:streams; redis:overview; redis:pubsub; redis:strings; redis:hashes",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "pure_vector",
+      "question": "Sorted Set 为什么适合做排行榜？",
+      "top1": "redis:transactions",
+      "retrieved": "redis:transactions; redis:overview; redis:sorted_sets; redis:hashes; redis:eviction",
+      "context_relevance": 1.0,
+      "top1_hit": 0.0,
+      "reciprocal_rank": 0.3333
+    },
+    {
+      "strategy": "pure_vector",
+      "question": "Redis Sentinel 主要解决什么问题？",
+      "top1": "redis:replication",
+      "retrieved": "redis:replication; redis:cluster; redis:scripting; redis:overview; redis:hashes",
+      "context_relevance": 0.0,
+      "top1_hit": 0.0,
+      "reciprocal_rank": 0.0
+    },
+    {
+      "strategy": "pure_vector",
+      "question": "Redis Cluster 是如何进行数据分片的？",
+      "top1": "redis:cluster",
+      "retrieved": "redis:cluster; redis:overview; redis:sentinel; redis:transactions; redis:strings",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "pure_vector",
+      "question": "WATCH 在 Redis 事务中起什么作用？",
+      "top1": "redis:transactions",
+      "retrieved": "redis:transactions; redis:pubsub; redis:expiration; redis:overview; redis:cache_risks",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "pure_vector",
+      "question": "Lua 脚本为什么适合库存扣减或限流？",
+      "top1": "redis:scripting",
+      "retrieved": "redis:scripting; redis:pubsub; redis:lists; redis:streams; redis:cache_risks",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "pure_vector",
+      "question": "Redis 内存达到 maxmemory 后会发生什么？",
+      "top1": "redis:eviction",
+      "retrieved": "redis:eviction; redis:strings; redis:cache_risks; redis:hashes; redis:transactions",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "pure_vector",
+      "question": "如何缓解缓存穿透、缓存击穿和缓存雪崩？",
+      "top1": "redis:cache_risks",
+      "retrieved": "redis:cache_risks; redis:expiration; redis:scripting; redis:transactions; redis:replication",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "pure_vector",
+      "question": "Redis String 的 SET、GET、INCR 分别适合什么场景？",
+      "top1": "redis:sorted_sets",
+      "retrieved": "redis:sorted_sets; redis:overview; redis:hashes; redis:pubsub; redis:strings",
+      "context_relevance": 1.0,
+      "top1_hit": 0.0,
+      "reciprocal_rank": 0.2
+    },
+    {
+      "strategy": "pure_vector",
+      "question": "Redis Hash 相比把对象序列化成字符串有什么优势？",
+      "top1": "redis:hashes",
+      "retrieved": "redis:hashes; redis:strings; redis:overview; redis:transactions; redis:cache_risks",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "pure_vector",
+      "question": "List 为什么适合简单队列，什么时候应该改用 Stream？",
+      "top1": "redis:lists",
+      "retrieved": "redis:lists; redis:streams; redis:scripting; redis:pubsub; redis:cluster",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "pure_vector",
+      "question": "Redis Replication 的同步过程包括哪些内容？",
+      "top1": "redis:hashes",
+      "retrieved": "redis:hashes; redis:cluster; redis:overview; redis:pubsub; redis:transactions",
+      "context_relevance": 0.0,
+      "top1_hit": 0.0,
+      "reciprocal_rank": 0.0
+    },
+    {
+      "strategy": "pure_vector",
+      "question": "allkeys-lru 和 volatile-lru 这类淘汰策略有什么区别？",
+      "top1": "redis:eviction",
+      "retrieved": "redis:eviction; redis:cache_risks; redis:expiration; redis:streams; redis:scripting",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "pure_vector",
+      "question": "SET 的 NX 选项可以怎样用于互斥锁？",
+      "top1": "redis:strings",
+      "retrieved": "redis:strings; redis:hashes; redis:streams; redis:lists; redis:scripting",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "pure_vector",
+      "question": "Redis 8 以后 Hash 字段级过期有什么意义？",
+      "top1": "redis:hashes",
+      "retrieved": "redis:hashes; redis:expiration; redis:transactions; redis:lists; redis:scripting",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "pure_vector",
+      "question": "Redis Cluster 中多 key 操作为什么通常要求位于同一个 hash slot？",
+      "top1": "redis:cluster",
+      "retrieved": "redis:cluster; redis:pubsub; redis:streams; redis:scripting; redis:eviction",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "pure_vector",
+      "question": "EVAL 和 EVALSHA 在 Redis Lua 脚本中分别有什么作用？",
+      "top1": "redis:scripting",
+      "retrieved": "redis:scripting; redis:pubsub; redis:overview; redis:expiration; redis:replication",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "pure_vector",
+      "question": "为什么 Redis 适合缓存、排行榜和实时分析这类场景？",
+      "top1": "redis:overview",
+      "retrieved": "redis:overview; redis:transactions; redis:cache_risks; redis:cluster; redis:sentinel",
+      "context_relevance": 0.5,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "bm25",
+      "question": "Redis 的 AOF 和 RDB 持久化有什么区别？",
+      "top1": "redis:persistence",
+      "retrieved": "redis:persistence; redis:pubsub; redis:transactions; redis:overview; redis:scripting",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "bm25",
+      "question": "Redis 中如何给 key 设置过期时间，TTL 的作用是什么？",
+      "top1": "redis:expiration",
+      "retrieved": "redis:expiration; redis:eviction; redis:strings; redis:cache_risks; redis:hashes",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "bm25",
+      "question": "Redis Stream 和 Pub/Sub 在可靠消费上有什么差异？",
+      "top1": "redis:streams",
+      "retrieved": "redis:streams; redis:pubsub; redis:lists; redis:transactions; redis:overview",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "bm25",
+      "question": "Sorted Set 为什么适合做排行榜？",
+      "top1": "redis:sorted_sets",
+      "retrieved": "redis:sorted_sets; redis:overview; redis:strings; redis:pubsub; redis:hashes",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "bm25",
+      "question": "Redis Sentinel 主要解决什么问题？",
+      "top1": "redis:sentinel",
+      "retrieved": "redis:sentinel; redis:replication; redis:transactions; redis:overview; redis:scripting",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "bm25",
+      "question": "Redis Cluster 是如何进行数据分片的？",
+      "top1": "redis:cluster",
+      "retrieved": "redis:cluster; redis:sentinel; redis:strings; redis:replication; redis:persistence",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "bm25",
+      "question": "WATCH 在 Redis 事务中起什么作用？",
+      "top1": "redis:transactions",
+      "retrieved": "redis:transactions; redis:overview; redis:scripting; redis:expiration; redis:eviction",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "bm25",
+      "question": "Lua 脚本为什么适合库存扣减或限流？",
+      "top1": "redis:scripting",
+      "retrieved": "redis:scripting; redis:strings; redis:cache_risks; redis:streams; redis:overview",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "bm25",
+      "question": "Redis 内存达到 maxmemory 后会发生什么？",
+      "top1": "redis:eviction",
+      "retrieved": "redis:eviction; redis:overview; redis:transactions; redis:scripting; redis:expiration",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "bm25",
+      "question": "如何缓解缓存穿透、缓存击穿和缓存雪崩？",
+      "top1": "redis:cache_risks",
+      "retrieved": "redis:cache_risks; redis:expiration; redis:eviction; redis:scripting; redis:overview",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "bm25",
+      "question": "Redis String 的 SET、GET、INCR 分别适合什么场景？",
+      "top1": "redis:strings",
+      "retrieved": "redis:strings; redis:lists; redis:sorted_sets; redis:scripting; redis:streams",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "bm25",
+      "question": "Redis Hash 相比把对象序列化成字符串有什么优势？",
+      "top1": "redis:hashes",
+      "retrieved": "redis:hashes; redis:strings; redis:lists; redis:overview; redis:cluster",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "bm25",
+      "question": "List 为什么适合简单队列，什么时候应该改用 Stream？",
+      "top1": "redis:lists",
+      "retrieved": "redis:lists; redis:streams; redis:pubsub; redis:strings; redis:scripting",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "bm25",
+      "question": "Redis Replication 的同步过程包括哪些内容？",
+      "top1": "redis:replication",
+      "retrieved": "redis:replication; redis:eviction; redis:cache_risks; redis:transactions; redis:overview",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "bm25",
+      "question": "allkeys-lru 和 volatile-lru 这类淘汰策略有什么区别？",
+      "top1": "redis:eviction",
+      "retrieved": "redis:eviction; redis:overview; redis:strings; redis:hashes; redis:lists",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "bm25",
+      "question": "SET 的 NX 选项可以怎样用于互斥锁？",
+      "top1": "redis:strings",
+      "retrieved": "redis:strings; redis:sorted_sets; redis:cache_risks; redis:hashes; redis:replication",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "bm25",
+      "question": "Redis 8 以后 Hash 字段级过期有什么意义？",
+      "top1": "redis:hashes",
+      "retrieved": "redis:hashes; redis:expiration; redis:cluster; redis:cache_risks; redis:eviction",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "bm25",
+      "question": "Redis Cluster 中多 key 操作为什么通常要求位于同一个 hash slot？",
+      "top1": "redis:cluster",
+      "retrieved": "redis:cluster; redis:streams; redis:hashes; redis:replication; redis:eviction",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "bm25",
+      "question": "EVAL 和 EVALSHA 在 Redis Lua 脚本中分别有什么作用？",
+      "top1": "redis:scripting",
+      "retrieved": "redis:scripting; redis:lists; redis:transactions; redis:overview; redis:expiration",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "bm25",
+      "question": "为什么 Redis 适合缓存、排行榜和实时分析这类场景？",
+      "top1": "redis:overview",
+      "retrieved": "redis:overview; redis:sorted_sets; redis:scripting; redis:pubsub; redis:eviction",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid",
+      "question": "Redis 的 AOF 和 RDB 持久化有什么区别？",
+      "top1": "redis:persistence",
+      "retrieved": "redis:persistence; redis:pubsub; redis:overview; redis:sentinel; redis:hashes",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid",
+      "question": "Redis 中如何给 key 设置过期时间，TTL 的作用是什么？",
+      "top1": "redis:expiration",
+      "retrieved": "redis:expiration; redis:eviction; redis:strings; redis:cache_risks; redis:scripting",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid",
+      "question": "Redis Stream 和 Pub/Sub 在可靠消费上有什么差异？",
+      "top1": "redis:streams",
+      "retrieved": "redis:streams; redis:pubsub; redis:overview; redis:strings; redis:hashes",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid",
+      "question": "Sorted Set 为什么适合做排行榜？",
+      "top1": "redis:sorted_sets",
+      "retrieved": "redis:sorted_sets; redis:overview; redis:transactions; redis:hashes; redis:sentinel",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid",
+      "question": "Redis Sentinel 主要解决什么问题？",
+      "top1": "redis:sentinel",
+      "retrieved": "redis:sentinel; redis:replication; redis:cluster; redis:scripting; redis:overview",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid",
+      "question": "Redis Cluster 是如何进行数据分片的？",
+      "top1": "redis:cluster",
+      "retrieved": "redis:cluster; redis:sentinel; redis:overview; redis:strings; redis:transactions",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid",
+      "question": "WATCH 在 Redis 事务中起什么作用？",
+      "top1": "redis:transactions",
+      "retrieved": "redis:transactions; redis:pubsub; redis:expiration; redis:overview; redis:cache_risks",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid",
+      "question": "Lua 脚本为什么适合库存扣减或限流？",
+      "top1": "redis:scripting",
+      "retrieved": "redis:scripting; redis:pubsub; redis:lists; redis:streams; redis:cache_risks",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid",
+      "question": "Redis 内存达到 maxmemory 后会发生什么？",
+      "top1": "redis:eviction",
+      "retrieved": "redis:eviction; redis:strings; redis:cache_risks; redis:hashes; redis:transactions",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid",
+      "question": "如何缓解缓存穿透、缓存击穿和缓存雪崩？",
+      "top1": "redis:cache_risks",
+      "retrieved": "redis:cache_risks; redis:expiration; redis:scripting; redis:transactions; redis:replication",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid",
+      "question": "Redis String 的 SET、GET、INCR 分别适合什么场景？",
+      "top1": "redis:strings",
+      "retrieved": "redis:strings; redis:sorted_sets; redis:overview; redis:hashes; redis:pubsub",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid",
+      "question": "Redis Hash 相比把对象序列化成字符串有什么优势？",
+      "top1": "redis:hashes",
+      "retrieved": "redis:hashes; redis:strings; redis:overview; redis:lists; redis:transactions",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid",
+      "question": "List 为什么适合简单队列，什么时候应该改用 Stream？",
+      "top1": "redis:lists",
+      "retrieved": "redis:lists; redis:streams; redis:pubsub; redis:scripting; redis:cluster",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid",
+      "question": "Redis Replication 的同步过程包括哪些内容？",
+      "top1": "redis:replication",
+      "retrieved": "redis:replication; redis:hashes; redis:cluster; redis:overview; redis:pubsub",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid",
+      "question": "allkeys-lru 和 volatile-lru 这类淘汰策略有什么区别？",
+      "top1": "redis:eviction",
+      "retrieved": "redis:eviction; redis:cache_risks; redis:expiration; redis:streams; redis:scripting",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid",
+      "question": "SET 的 NX 选项可以怎样用于互斥锁？",
+      "top1": "redis:strings",
+      "retrieved": "redis:strings; redis:hashes; redis:sorted_sets; redis:streams; redis:lists",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid",
+      "question": "Redis 8 以后 Hash 字段级过期有什么意义？",
+      "top1": "redis:hashes",
+      "retrieved": "redis:hashes; redis:expiration; redis:cluster; redis:transactions; redis:cache_risks",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid",
+      "question": "Redis Cluster 中多 key 操作为什么通常要求位于同一个 hash slot？",
+      "top1": "redis:cluster",
+      "retrieved": "redis:cluster; redis:streams; redis:pubsub; redis:scripting; redis:eviction",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid",
+      "question": "EVAL 和 EVALSHA 在 Redis Lua 脚本中分别有什么作用？",
+      "top1": "redis:scripting",
+      "retrieved": "redis:scripting; redis:pubsub; redis:overview; redis:expiration; redis:replication",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid",
+      "question": "为什么 Redis 适合缓存、排行榜和实时分析这类场景？",
+      "top1": "redis:overview",
+      "retrieved": "redis:overview; redis:cache_risks; redis:scripting; redis:pubsub; redis:transactions",
+      "context_relevance": 0.5,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "question": "Redis 的 AOF 和 RDB 持久化有什么区别？",
+      "top1": "redis:persistence",
+      "retrieved": "redis:persistence; redis:pubsub; redis:overview; redis:sentinel; redis:hashes",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "question": "Redis 中如何给 key 设置过期时间，TTL 的作用是什么？",
+      "top1": "redis:expiration",
+      "retrieved": "redis:expiration; redis:eviction; redis:strings; redis:cache_risks; redis:scripting",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "question": "Redis Stream 和 Pub/Sub 在可靠消费上有什么差异？",
+      "top1": "redis:streams",
+      "retrieved": "redis:streams; redis:pubsub; redis:overview; redis:lists; redis:strings",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "question": "Sorted Set 为什么适合做排行榜？",
+      "top1": "redis:sorted_sets",
+      "retrieved": "redis:sorted_sets; redis:overview; redis:transactions; redis:hashes; redis:sentinel",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "question": "Redis Sentinel 主要解决什么问题？",
+      "top1": "redis:sentinel",
+      "retrieved": "redis:sentinel; redis:replication; redis:cluster; redis:scripting; redis:overview",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "question": "Redis Cluster 是如何进行数据分片的？",
+      "top1": "redis:cluster",
+      "retrieved": "redis:cluster; redis:sentinel; redis:strings; redis:overview; redis:transactions",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "question": "WATCH 在 Redis 事务中起什么作用？",
+      "top1": "redis:transactions",
+      "retrieved": "redis:transactions; redis:pubsub; redis:expiration; redis:overview; redis:cache_risks",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "question": "Lua 脚本为什么适合库存扣减或限流？",
+      "top1": "redis:scripting",
+      "retrieved": "redis:scripting; redis:pubsub; redis:lists; redis:streams; redis:cache_risks",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "question": "Redis 内存达到 maxmemory 后会发生什么？",
+      "top1": "redis:eviction",
+      "retrieved": "redis:eviction; redis:strings; redis:cache_risks; redis:hashes; redis:overview",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "question": "如何缓解缓存穿透、缓存击穿和缓存雪崩？",
+      "top1": "redis:cache_risks",
+      "retrieved": "redis:cache_risks; redis:expiration; redis:scripting; redis:transactions; redis:eviction",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "question": "Redis String 的 SET、GET、INCR 分别适合什么场景？",
+      "top1": "redis:strings",
+      "retrieved": "redis:strings; redis:sorted_sets; redis:overview; redis:hashes; redis:scripting",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "question": "Redis Hash 相比把对象序列化成字符串有什么优势？",
+      "top1": "redis:hashes",
+      "retrieved": "redis:hashes; redis:strings; redis:overview; redis:lists; redis:transactions",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "question": "List 为什么适合简单队列，什么时候应该改用 Stream？",
+      "top1": "redis:lists",
+      "retrieved": "redis:lists; redis:streams; redis:pubsub; redis:scripting; redis:sentinel",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "question": "Redis Replication 的同步过程包括哪些内容？",
+      "top1": "redis:replication",
+      "retrieved": "redis:replication; redis:hashes; redis:cluster; redis:overview; redis:pubsub",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "question": "allkeys-lru 和 volatile-lru 这类淘汰策略有什么区别？",
+      "top1": "redis:eviction",
+      "retrieved": "redis:eviction; redis:cache_risks; redis:expiration; redis:streams; redis:scripting",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "question": "SET 的 NX 选项可以怎样用于互斥锁？",
+      "top1": "redis:strings",
+      "retrieved": "redis:strings; redis:hashes; redis:sorted_sets; redis:lists; redis:streams",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "question": "Redis 8 以后 Hash 字段级过期有什么意义？",
+      "top1": "redis:hashes",
+      "retrieved": "redis:hashes; redis:expiration; redis:cluster; redis:transactions; redis:cache_risks",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "question": "Redis Cluster 中多 key 操作为什么通常要求位于同一个 hash slot？",
+      "top1": "redis:cluster",
+      "retrieved": "redis:cluster; redis:streams; redis:pubsub; redis:scripting; redis:eviction",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "question": "EVAL 和 EVALSHA 在 Redis Lua 脚本中分别有什么作用？",
+      "top1": "redis:scripting",
+      "retrieved": "redis:scripting; redis:pubsub; redis:overview; redis:expiration; redis:replication",
+      "context_relevance": 1.0,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "question": "为什么 Redis 适合缓存、排行榜和实时分析这类场景？",
+      "top1": "redis:overview",
+      "retrieved": "redis:overview; redis:cache_risks; redis:scripting; redis:pubsub; redis:transactions",
+      "context_relevance": 0.5,
+      "top1_hit": 1.0,
+      "reciprocal_rank": 1.0
+    }
+  ]
+}

@@ -28,12 +28,24 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-dir", default="outputs", help="Directory for evaluation outputs")
     parser.add_argument("--top-k", type=int, default=5, help="Number of retrieved chunks")
     parser.add_argument("--rebuild", action="store_true", help="Rebuild index before evaluation")
+    parser.add_argument("--embedding-model", default="hashing", help="hashing, bge, or a SentenceTransformer model")
+    parser.add_argument("--vector-store", default="local", choices=["local", "faiss", "chroma"], help="Vector store backend when rebuilding")
+    parser.add_argument("--retrieval-mode", default="hybrid", choices=["vector", "bm25", "hybrid_no_rerank", "hybrid"], help="Retrieval strategy")
+    parser.add_argument("--reranker", default="lightweight", choices=["none", "lightweight", "cross-encoder", "bge-reranker"], help="Second-stage reranker")
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
-    pipeline = load_pipeline(args.corpus, args.index_dir, rebuild=args.rebuild)
+    pipeline = load_pipeline(
+        args.corpus,
+        args.index_dir,
+        rebuild=args.rebuild,
+        embedding_model=args.embedding_model,
+        vector_store=args.vector_store,
+        retrieval_mode=args.retrieval_mode,
+        reranker=args.reranker,
+    )
     samples = load_eval_samples(args.eval)
 
     row_metrics: List[Dict[str, float]] = []
@@ -50,6 +62,9 @@ def main() -> None:
                 "answer_relevance": metrics["answer_relevance"],
                 "answer": generated.answer,
                 "sources": "; ".join(source.doc_id for source in generated.sources),
+                "citation_passed": generated.citation_check.passed
+                if generated.citation_check
+                else False,
             }
         )
 

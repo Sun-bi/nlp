@@ -1,0 +1,81 @@
+strategy,question,top1,retrieved,context_relevance,top1_hit,reciprocal_rank
+pure_vector,Redis 的 AOF 和 RDB 持久化有什么区别？,redis:persistence,redis:persistence; redis:pubsub; redis:overview; redis:sentinel; redis:hashes,1.0,1.0,1.0
+pure_vector,Redis 中如何给 key 设置过期时间，TTL 的作用是什么？,redis:expiration,redis:expiration; redis:scripting; redis:eviction; redis:cache_risks; redis:strings,1.0,1.0,1.0
+pure_vector,Redis Stream 和 Pub/Sub 在可靠消费上有什么差异？,redis:streams,redis:streams; redis:overview; redis:pubsub; redis:strings; redis:hashes,1.0,1.0,1.0
+pure_vector,Sorted Set 为什么适合做排行榜？,redis:transactions,redis:transactions; redis:overview; redis:sorted_sets; redis:hashes; redis:eviction,1.0,0.0,0.3333
+pure_vector,Redis Sentinel 主要解决什么问题？,redis:replication,redis:replication; redis:cluster; redis:scripting; redis:overview; redis:hashes,0.0,0.0,0.0
+pure_vector,Redis Cluster 是如何进行数据分片的？,redis:cluster,redis:cluster; redis:overview; redis:sentinel; redis:transactions; redis:strings,1.0,1.0,1.0
+pure_vector,WATCH 在 Redis 事务中起什么作用？,redis:transactions,redis:transactions; redis:pubsub; redis:expiration; redis:overview; redis:cache_risks,1.0,1.0,1.0
+pure_vector,Lua 脚本为什么适合库存扣减或限流？,redis:scripting,redis:scripting; redis:pubsub; redis:lists; redis:streams; redis:cache_risks,1.0,1.0,1.0
+pure_vector,Redis 内存达到 maxmemory 后会发生什么？,redis:eviction,redis:eviction; redis:strings; redis:cache_risks; redis:hashes; redis:transactions,1.0,1.0,1.0
+pure_vector,如何缓解缓存穿透、缓存击穿和缓存雪崩？,redis:cache_risks,redis:cache_risks; redis:expiration; redis:scripting; redis:transactions; redis:replication,1.0,1.0,1.0
+pure_vector,Redis String 的 SET、GET、INCR 分别适合什么场景？,redis:sorted_sets,redis:sorted_sets; redis:overview; redis:hashes; redis:pubsub; redis:strings,1.0,0.0,0.2
+pure_vector,Redis Hash 相比把对象序列化成字符串有什么优势？,redis:hashes,redis:hashes; redis:strings; redis:overview; redis:transactions; redis:cache_risks,1.0,1.0,1.0
+pure_vector,List 为什么适合简单队列，什么时候应该改用 Stream？,redis:lists,redis:lists; redis:streams; redis:scripting; redis:pubsub; redis:cluster,1.0,1.0,1.0
+pure_vector,Redis Replication 的同步过程包括哪些内容？,redis:hashes,redis:hashes; redis:cluster; redis:overview; redis:pubsub; redis:transactions,0.0,0.0,0.0
+pure_vector,allkeys-lru 和 volatile-lru 这类淘汰策略有什么区别？,redis:eviction,redis:eviction; redis:cache_risks; redis:expiration; redis:streams; redis:scripting,1.0,1.0,1.0
+pure_vector,SET 的 NX 选项可以怎样用于互斥锁？,redis:strings,redis:strings; redis:hashes; redis:streams; redis:lists; redis:scripting,1.0,1.0,1.0
+pure_vector,Redis 8 以后 Hash 字段级过期有什么意义？,redis:hashes,redis:hashes; redis:expiration; redis:transactions; redis:lists; redis:scripting,1.0,1.0,1.0
+pure_vector,Redis Cluster 中多 key 操作为什么通常要求位于同一个 hash slot？,redis:cluster,redis:cluster; redis:pubsub; redis:streams; redis:scripting; redis:eviction,1.0,1.0,1.0
+pure_vector,EVAL 和 EVALSHA 在 Redis Lua 脚本中分别有什么作用？,redis:scripting,redis:scripting; redis:pubsub; redis:overview; redis:expiration; redis:replication,1.0,1.0,1.0
+pure_vector,为什么 Redis 适合缓存、排行榜和实时分析这类场景？,redis:overview,redis:overview; redis:transactions; redis:cache_risks; redis:cluster; redis:sentinel,0.5,1.0,1.0
+bm25,Redis 的 AOF 和 RDB 持久化有什么区别？,redis:persistence,redis:persistence; redis:pubsub; redis:transactions; redis:overview; redis:scripting,1.0,1.0,1.0
+bm25,Redis 中如何给 key 设置过期时间，TTL 的作用是什么？,redis:expiration,redis:expiration; redis:eviction; redis:strings; redis:cache_risks; redis:hashes,1.0,1.0,1.0
+bm25,Redis Stream 和 Pub/Sub 在可靠消费上有什么差异？,redis:streams,redis:streams; redis:pubsub; redis:lists; redis:transactions; redis:overview,1.0,1.0,1.0
+bm25,Sorted Set 为什么适合做排行榜？,redis:sorted_sets,redis:sorted_sets; redis:overview; redis:strings; redis:pubsub; redis:hashes,1.0,1.0,1.0
+bm25,Redis Sentinel 主要解决什么问题？,redis:sentinel,redis:sentinel; redis:replication; redis:transactions; redis:overview; redis:scripting,1.0,1.0,1.0
+bm25,Redis Cluster 是如何进行数据分片的？,redis:cluster,redis:cluster; redis:sentinel; redis:strings; redis:replication; redis:persistence,1.0,1.0,1.0
+bm25,WATCH 在 Redis 事务中起什么作用？,redis:transactions,redis:transactions; redis:overview; redis:scripting; redis:expiration; redis:eviction,1.0,1.0,1.0
+bm25,Lua 脚本为什么适合库存扣减或限流？,redis:scripting,redis:scripting; redis:strings; redis:cache_risks; redis:streams; redis:overview,1.0,1.0,1.0
+bm25,Redis 内存达到 maxmemory 后会发生什么？,redis:eviction,redis:eviction; redis:overview; redis:transactions; redis:scripting; redis:expiration,1.0,1.0,1.0
+bm25,如何缓解缓存穿透、缓存击穿和缓存雪崩？,redis:cache_risks,redis:cache_risks; redis:expiration; redis:eviction; redis:scripting; redis:overview,1.0,1.0,1.0
+bm25,Redis String 的 SET、GET、INCR 分别适合什么场景？,redis:strings,redis:strings; redis:lists; redis:sorted_sets; redis:scripting; redis:streams,1.0,1.0,1.0
+bm25,Redis Hash 相比把对象序列化成字符串有什么优势？,redis:hashes,redis:hashes; redis:strings; redis:lists; redis:overview; redis:cluster,1.0,1.0,1.0
+bm25,List 为什么适合简单队列，什么时候应该改用 Stream？,redis:lists,redis:lists; redis:streams; redis:pubsub; redis:strings; redis:scripting,1.0,1.0,1.0
+bm25,Redis Replication 的同步过程包括哪些内容？,redis:replication,redis:replication; redis:eviction; redis:cache_risks; redis:transactions; redis:overview,1.0,1.0,1.0
+bm25,allkeys-lru 和 volatile-lru 这类淘汰策略有什么区别？,redis:eviction,redis:eviction; redis:overview; redis:strings; redis:hashes; redis:lists,1.0,1.0,1.0
+bm25,SET 的 NX 选项可以怎样用于互斥锁？,redis:strings,redis:strings; redis:sorted_sets; redis:cache_risks; redis:hashes; redis:replication,1.0,1.0,1.0
+bm25,Redis 8 以后 Hash 字段级过期有什么意义？,redis:hashes,redis:hashes; redis:expiration; redis:cluster; redis:cache_risks; redis:eviction,1.0,1.0,1.0
+bm25,Redis Cluster 中多 key 操作为什么通常要求位于同一个 hash slot？,redis:cluster,redis:cluster; redis:streams; redis:hashes; redis:replication; redis:eviction,1.0,1.0,1.0
+bm25,EVAL 和 EVALSHA 在 Redis Lua 脚本中分别有什么作用？,redis:scripting,redis:scripting; redis:lists; redis:transactions; redis:overview; redis:expiration,1.0,1.0,1.0
+bm25,为什么 Redis 适合缓存、排行榜和实时分析这类场景？,redis:overview,redis:overview; redis:sorted_sets; redis:scripting; redis:pubsub; redis:eviction,1.0,1.0,1.0
+hybrid,Redis 的 AOF 和 RDB 持久化有什么区别？,redis:persistence,redis:persistence; redis:pubsub; redis:overview; redis:sentinel; redis:hashes,1.0,1.0,1.0
+hybrid,Redis 中如何给 key 设置过期时间，TTL 的作用是什么？,redis:expiration,redis:expiration; redis:eviction; redis:strings; redis:cache_risks; redis:scripting,1.0,1.0,1.0
+hybrid,Redis Stream 和 Pub/Sub 在可靠消费上有什么差异？,redis:streams,redis:streams; redis:pubsub; redis:overview; redis:strings; redis:hashes,1.0,1.0,1.0
+hybrid,Sorted Set 为什么适合做排行榜？,redis:sorted_sets,redis:sorted_sets; redis:overview; redis:transactions; redis:hashes; redis:sentinel,1.0,1.0,1.0
+hybrid,Redis Sentinel 主要解决什么问题？,redis:sentinel,redis:sentinel; redis:replication; redis:cluster; redis:scripting; redis:overview,1.0,1.0,1.0
+hybrid,Redis Cluster 是如何进行数据分片的？,redis:cluster,redis:cluster; redis:sentinel; redis:overview; redis:strings; redis:transactions,1.0,1.0,1.0
+hybrid,WATCH 在 Redis 事务中起什么作用？,redis:transactions,redis:transactions; redis:pubsub; redis:expiration; redis:overview; redis:cache_risks,1.0,1.0,1.0
+hybrid,Lua 脚本为什么适合库存扣减或限流？,redis:scripting,redis:scripting; redis:pubsub; redis:lists; redis:streams; redis:cache_risks,1.0,1.0,1.0
+hybrid,Redis 内存达到 maxmemory 后会发生什么？,redis:eviction,redis:eviction; redis:strings; redis:cache_risks; redis:hashes; redis:transactions,1.0,1.0,1.0
+hybrid,如何缓解缓存穿透、缓存击穿和缓存雪崩？,redis:cache_risks,redis:cache_risks; redis:expiration; redis:scripting; redis:transactions; redis:replication,1.0,1.0,1.0
+hybrid,Redis String 的 SET、GET、INCR 分别适合什么场景？,redis:strings,redis:strings; redis:sorted_sets; redis:overview; redis:hashes; redis:pubsub,1.0,1.0,1.0
+hybrid,Redis Hash 相比把对象序列化成字符串有什么优势？,redis:hashes,redis:hashes; redis:strings; redis:overview; redis:lists; redis:transactions,1.0,1.0,1.0
+hybrid,List 为什么适合简单队列，什么时候应该改用 Stream？,redis:lists,redis:lists; redis:streams; redis:pubsub; redis:scripting; redis:cluster,1.0,1.0,1.0
+hybrid,Redis Replication 的同步过程包括哪些内容？,redis:replication,redis:replication; redis:hashes; redis:cluster; redis:overview; redis:pubsub,1.0,1.0,1.0
+hybrid,allkeys-lru 和 volatile-lru 这类淘汰策略有什么区别？,redis:eviction,redis:eviction; redis:cache_risks; redis:expiration; redis:streams; redis:scripting,1.0,1.0,1.0
+hybrid,SET 的 NX 选项可以怎样用于互斥锁？,redis:strings,redis:strings; redis:hashes; redis:sorted_sets; redis:streams; redis:lists,1.0,1.0,1.0
+hybrid,Redis 8 以后 Hash 字段级过期有什么意义？,redis:hashes,redis:hashes; redis:expiration; redis:cluster; redis:transactions; redis:cache_risks,1.0,1.0,1.0
+hybrid,Redis Cluster 中多 key 操作为什么通常要求位于同一个 hash slot？,redis:cluster,redis:cluster; redis:streams; redis:pubsub; redis:scripting; redis:eviction,1.0,1.0,1.0
+hybrid,EVAL 和 EVALSHA 在 Redis Lua 脚本中分别有什么作用？,redis:scripting,redis:scripting; redis:pubsub; redis:overview; redis:expiration; redis:replication,1.0,1.0,1.0
+hybrid,为什么 Redis 适合缓存、排行榜和实时分析这类场景？,redis:overview,redis:overview; redis:cache_risks; redis:scripting; redis:pubsub; redis:transactions,0.5,1.0,1.0
+hybrid_rerank,Redis 的 AOF 和 RDB 持久化有什么区别？,redis:persistence,redis:persistence; redis:pubsub; redis:overview; redis:sentinel; redis:hashes,1.0,1.0,1.0
+hybrid_rerank,Redis 中如何给 key 设置过期时间，TTL 的作用是什么？,redis:expiration,redis:expiration; redis:eviction; redis:strings; redis:cache_risks; redis:scripting,1.0,1.0,1.0
+hybrid_rerank,Redis Stream 和 Pub/Sub 在可靠消费上有什么差异？,redis:streams,redis:streams; redis:pubsub; redis:overview; redis:lists; redis:strings,1.0,1.0,1.0
+hybrid_rerank,Sorted Set 为什么适合做排行榜？,redis:sorted_sets,redis:sorted_sets; redis:overview; redis:transactions; redis:hashes; redis:sentinel,1.0,1.0,1.0
+hybrid_rerank,Redis Sentinel 主要解决什么问题？,redis:sentinel,redis:sentinel; redis:replication; redis:cluster; redis:scripting; redis:overview,1.0,1.0,1.0
+hybrid_rerank,Redis Cluster 是如何进行数据分片的？,redis:cluster,redis:cluster; redis:sentinel; redis:strings; redis:overview; redis:transactions,1.0,1.0,1.0
+hybrid_rerank,WATCH 在 Redis 事务中起什么作用？,redis:transactions,redis:transactions; redis:pubsub; redis:expiration; redis:overview; redis:cache_risks,1.0,1.0,1.0
+hybrid_rerank,Lua 脚本为什么适合库存扣减或限流？,redis:scripting,redis:scripting; redis:pubsub; redis:lists; redis:streams; redis:cache_risks,1.0,1.0,1.0
+hybrid_rerank,Redis 内存达到 maxmemory 后会发生什么？,redis:eviction,redis:eviction; redis:strings; redis:cache_risks; redis:hashes; redis:overview,1.0,1.0,1.0
+hybrid_rerank,如何缓解缓存穿透、缓存击穿和缓存雪崩？,redis:cache_risks,redis:cache_risks; redis:expiration; redis:scripting; redis:transactions; redis:eviction,1.0,1.0,1.0
+hybrid_rerank,Redis String 的 SET、GET、INCR 分别适合什么场景？,redis:strings,redis:strings; redis:sorted_sets; redis:overview; redis:hashes; redis:scripting,1.0,1.0,1.0
+hybrid_rerank,Redis Hash 相比把对象序列化成字符串有什么优势？,redis:hashes,redis:hashes; redis:strings; redis:overview; redis:lists; redis:transactions,1.0,1.0,1.0
+hybrid_rerank,List 为什么适合简单队列，什么时候应该改用 Stream？,redis:lists,redis:lists; redis:streams; redis:pubsub; redis:scripting; redis:sentinel,1.0,1.0,1.0
+hybrid_rerank,Redis Replication 的同步过程包括哪些内容？,redis:replication,redis:replication; redis:hashes; redis:cluster; redis:overview; redis:pubsub,1.0,1.0,1.0
+hybrid_rerank,allkeys-lru 和 volatile-lru 这类淘汰策略有什么区别？,redis:eviction,redis:eviction; redis:cache_risks; redis:expiration; redis:streams; redis:scripting,1.0,1.0,1.0
+hybrid_rerank,SET 的 NX 选项可以怎样用于互斥锁？,redis:strings,redis:strings; redis:hashes; redis:sorted_sets; redis:lists; redis:streams,1.0,1.0,1.0
+hybrid_rerank,Redis 8 以后 Hash 字段级过期有什么意义？,redis:hashes,redis:hashes; redis:expiration; redis:cluster; redis:transactions; redis:cache_risks,1.0,1.0,1.0
+hybrid_rerank,Redis Cluster 中多 key 操作为什么通常要求位于同一个 hash slot？,redis:cluster,redis:cluster; redis:streams; redis:pubsub; redis:scripting; redis:eviction,1.0,1.0,1.0
+hybrid_rerank,EVAL 和 EVALSHA 在 Redis Lua 脚本中分别有什么作用？,redis:scripting,redis:scripting; redis:pubsub; redis:overview; redis:expiration; redis:replication,1.0,1.0,1.0
+hybrid_rerank,为什么 Redis 适合缓存、排行榜和实时分析这类场景？,redis:overview,redis:overview; redis:cache_risks; redis:scripting; redis:pubsub; redis:transactions,0.5,1.0,1.0

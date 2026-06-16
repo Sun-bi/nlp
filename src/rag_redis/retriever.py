@@ -8,7 +8,7 @@ from dataclasses import dataclass, replace
 from typing import Dict, Iterable, List, Sequence
 
 from .chunking import Chunk
-from .embeddings import HashingEmbeddingModel
+from .embeddings import EmbeddingModel, HashingEmbeddingModel
 from .query import rewrite_query
 from .text import tokenize
 from .vector_store import LocalVectorStore
@@ -85,12 +85,14 @@ class HybridRetriever:
     def __init__(
         self,
         chunks: Sequence[Chunk],
-        embedder: HashingEmbeddingModel,
+        embedder: EmbeddingModel,
         vector_store: LocalVectorStore,
         vector_weight: float = 0.45,
         bm25_weight: float = 0.55,
         enable_query_rewrite: bool = True,
         enable_rerank: bool = True,
+        reranker: str = "lightweight",
+        cross_encoder_model: str = "BAAI/bge-reranker-base",
     ) -> None:
         self.chunks = list(chunks)
         self.embedder = embedder
@@ -100,16 +102,21 @@ class HybridRetriever:
         self.bm25_weight = bm25_weight
         self.enable_query_rewrite = enable_query_rewrite
         self.enable_rerank = enable_rerank
+        self.reranker = reranker
+        self.cross_encoder_model = cross_encoder_model
+        self._cross_encoder = None
 
     @classmethod
     def from_chunks(
         cls,
         chunks: Sequence[Chunk],
-        embedder: HashingEmbeddingModel | None = None,
+        embedder: EmbeddingModel | None = None,
         vector_weight: float = 0.45,
         bm25_weight: float = 0.55,
         enable_query_rewrite: bool = True,
         enable_rerank: bool = True,
+        reranker: str = "lightweight",
+        cross_encoder_model: str = "BAAI/bge-reranker-base",
     ) -> "HybridRetriever":
         actual_embedder = embedder or HashingEmbeddingModel()
         vector_store = LocalVectorStore.from_chunks(chunks, actual_embedder)
@@ -121,6 +128,8 @@ class HybridRetriever:
             bm25_weight=bm25_weight,
             enable_query_rewrite=enable_query_rewrite,
             enable_rerank=enable_rerank,
+            reranker=reranker,
+            cross_encoder_model=cross_encoder_model,
         )
 
     def search(self, question: str, top_k: int = 5) -> List[RetrievalResult]:
@@ -152,10 +161,11 @@ class HybridRetriever:
         results.sort(key=lambda result: result.combined_score, reverse=True)
         if not self.enable_rerank:
             return results[:top_k]
-        return self._rerank(results, tokenize(rewritten), top_k=top_k)
+        return self._rerank(rewritten, results, tokenize(rewritten), top_k=top_k)
 
     def _rerank(
         self,
+        rewritten_query: str,
         results: Sequence[RetrievalResult],
         query_tokens: Sequence[str],
         top_k: int,
@@ -166,6 +176,11 @@ class HybridRetriever:
 
         pool_size = max(top_k * 3, top_k)
         candidate_pool = results[:pool_size]
+        if self.reranker.strip().lower() in {"cross-encoder", "bge-reranker", "bge"}:
+            neural = self._cross_encoder_rerank(rewritten_query, candidate_pool, top_k)
+            if neural is not None:
+                return neural
+
         reranked: List[RetrievalResult] = []
         for result in candidate_pool:
             chunk_tokens = set(result.chunk.tokens)
@@ -182,6 +197,30 @@ class HybridRetriever:
                 )
             )
 
+        reranked.sort(
+            key=lambda result: (result.rerank_score, result.combined_score),
+            reverse=True,
+        )
+        return reranked[:top_k]
+
+    def _cross_encoder_rerank(
+        self,
+        rewritten_query: str,
+        results: Sequence[RetrievalResult],
+        top_k: int,
+    ) -> List[RetrievalResult] | None:
+        try:
+            from sentence_transformers import CrossEncoder
+        except ImportError:
+            return None
+        if self._cross_encoder is None:
+            self._cross_encoder = CrossEncoder(self.cross_encoder_model)
+        pairs = [(rewritten_query, result.chunk.text) for result in results]
+        scores = self._cross_encoder.predict(pairs)
+        reranked = [
+            replace(result, rerank_score=float(score))
+            for result, score in zip(results, scores)
+        ]
         reranked.sort(
             key=lambda result: (result.rerank_score, result.combined_score),
             reverse=True,
