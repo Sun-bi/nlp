@@ -1,0 +1,5 @@
+$ python3 build_index.py
+Built Redis RAG index
+Corpus: /Users/sun/deeplearning/nlp/data/raw/redis_seed_docs.jsonl
+Index: /Users/sun/deeplearning/nlp/data/index
+Chunks: 16

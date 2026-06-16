@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import subprocess
 import sys
 import textwrap
@@ -15,11 +16,10 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from PIL import Image, ImageDraw, ImageFont
 
-from rag_redis.pipeline import load_pipeline
-
-
 OUT = ROOT / "slides" / "assets"
 OUT.mkdir(parents=True, exist_ok=True)
+RUN_LOGS = ROOT / "outputs" / "run_logs"
+RUN_LOGS.mkdir(parents=True, exist_ok=True)
 
 WIDE = (1600, 900)
 RED = "#D92D20"
@@ -54,7 +54,35 @@ F_H1 = font(38, True)
 F_H2 = font(30, True)
 F_BODY = font(25)
 F_SMALL = font(21)
-F_MONO = ImageFont.truetype("/System/Library/Fonts/Menlo.ttc", 22) if Path("/System/Library/Fonts/Menlo.ttc").exists() else font(22)
+F_MONO = font(20)
+
+
+def run_project_command(args: list[str], log_name: str) -> str:
+    env = os.environ.copy()
+    env["PYTHONPATH"] = str(ROOT / "src")
+    for key in ("DEEPSEEK_API_KEY", "OPENAI_API_KEY", "OPENAI_BASE_URL", "OPENAI_MODEL"):
+        env.pop(key, None)
+    completed = subprocess.run(
+        [sys.executable, *args],
+        cwd=ROOT,
+        env=env,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    command = f"$ python3 {' '.join(args)}"
+    output = completed.stdout.strip()
+    if completed.stderr.strip():
+        output = f"{output}\n\n[stderr]\n{completed.stderr.strip()}" if output else completed.stderr.strip()
+    text = f"{command}\n{output}\n"
+    (RUN_LOGS / log_name).write_text(text, encoding="utf-8")
+    return text
+
+
+def run_json_command(args: list[str], log_name: str) -> dict:
+    text = run_project_command(args, log_name)
+    json_text = "\n".join(text.splitlines()[1:])
+    return json.loads(json_text)
 
 
 def rounded(draw: ImageDraw.ImageDraw, xy, radius=24, fill=PANEL, outline=LINE, width=2):
@@ -67,6 +95,42 @@ def wrap(text: str, width: int) -> str:
 
 def draw_wrapped(draw, text, xy, width_chars, fnt, fill=TEXT, spacing=8):
     draw.multiline_text(xy, wrap(text, width_chars), font=fnt, fill=fill, spacing=spacing)
+
+
+def terminal_lines(text: str, width_chars: int = 92, max_lines: int = 18) -> list[str]:
+    lines: list[str] = []
+    for line in text.strip().splitlines():
+        if not line:
+            lines.append("")
+            continue
+        wrapped = textwrap.wrap(
+            line,
+            width=width_chars,
+            break_long_words=True,
+            replace_whitespace=False,
+        )
+        lines.extend(wrapped or [""])
+    if len(lines) > max_lines:
+        return lines[: max_lines - 1] + ["..."]
+    return lines
+
+
+def draw_terminal_panel(draw, text: str, xy, title: str = "VS Code Terminal actual run"):
+    x1, y1, x2, y2 = xy
+    draw.rounded_rectangle((x1 + 8, y1 + 10, x2 + 8, y2 + 10), radius=26, fill="#D9E1EA")
+    draw.rounded_rectangle((x1, y1, x2, y2), radius=26, fill="#101826", outline="#101826", width=2)
+    draw.rounded_rectangle((x1, y1, x2, y1 + 54), radius=26, fill="#1E293B")
+    draw.rectangle((x1, y1 + 27, x2, y1 + 54), fill="#1E293B")
+    for i, color in enumerate(("#FF5F56", "#FFBD2E", "#27C93F")):
+        draw.ellipse((x1 + 26 + i * 28, y1 + 18, x1 + 40 + i * 28, y1 + 32), fill=color)
+    draw.text((x1 + 130, y1 + 16), title, font=F_SMALL, fill="#E2E8F0")
+    y = y1 + 78
+    for line in terminal_lines(text, width_chars=82, max_lines=19):
+        color = "#A7F3D0" if line.startswith("$") else "#E5E7EB"
+        if line in {"问题", "答案", "来源"} or line.startswith("Context") or line.startswith("Faithfulness") or line.startswith("Answer"):
+            color = "#FCA5A5"
+        draw.text((x1 + 34, y), line, font=F_MONO, fill=color)
+        y += 27
 
 
 def shadow_card(draw, xy, radius=26, fill=PANEL, outline=LINE):
@@ -147,8 +211,9 @@ def create_architecture_photo():
         ("Chunking", 540, 250, BLUE),
         ("Embedding\nVector DB", 760, 165, AMBER),
         ("BM25\nIndex", 760, 335, TEAL),
-        ("Hybrid\nRetriever", 1010, 250, RED),
-        ("DeepSeek /\nFallback", 1240, 250, BLUE),
+        ("Hybrid\nRetriever", 980, 250, RED),
+        ("Light\nReranker", 1190, 250, AMBER),
+        ("DeepSeek /\nFallback", 1390, 250, BLUE),
     ]
     for text, x, y, color in nodes:
         shadow_card(draw, (x, y, x + 165, y + 95), radius=22, fill="#FFFFFF", outline=color)
@@ -158,9 +223,10 @@ def create_architecture_photo():
         (475, 298, 540, 298),
         (705, 298, 760, 210),
         (705, 298, 760, 380),
-        (925, 210, 1010, 292),
-        (925, 380, 1010, 305),
-        (1175, 298, 1240, 298),
+        (925, 210, 980, 292),
+        (925, 380, 980, 305),
+        (1145, 298, 1190, 298),
+        (1355, 298, 1390, 298),
     ]
     for x1, y1, x2, y2 in arrows:
         draw.line((x1, y1, x2, y2), fill=RED, width=5)
@@ -170,94 +236,57 @@ def create_architecture_photo():
         draw.polygon([(x2, y2), p1, p2], fill=RED)
     shadow_card(draw, (250, 560, 1350, 720), radius=26, fill="#FFFFFF", outline="#DDE5EF")
     draw.text((300, 590), "高级策略", font=F_H2, fill=RED)
-    draw.text((300, 648), "Query Rewriting + BM25/Vector Hybrid Retrieval + Context Filtering", font=F_BODY, fill=INK)
+    draw.text((300, 648), "Query Rewriting + Hybrid Retrieval + Lightweight Reranking + Context Filtering", font=F_BODY, fill=INK)
     img.save(OUT / "architecture_flow.png")
 
 
-def get_infer_payload():
-    pipeline = load_pipeline(ROOT / "data/raw/redis_seed_docs.jsonl", ROOT / "data/index", rebuild=True)
-    question = "Redis 的 AOF 和 RDB 持久化有什么区别？"
-    generated, contexts = pipeline.ask(question, top_k=5)
-    return {
-        "question": question,
-        "answer": generated.answer,
-        "sources": [
-            {
-                "doc_id": source.doc_id,
-                "title": source.title,
-                "score": source.score,
-            }
-            for source in generated.sources
-        ],
-        "retrieved": [
-            {
-                "doc_id": result.chunk.doc_id,
-                "title": result.chunk.source_title,
-                "combined": result.combined_score,
-                "vector": result.vector_score,
-                "bm25": result.bm25_score,
-            }
-            for result in contexts[:5]
-        ],
-    }
-
-
-def create_inference_result():
-    payload = get_infer_payload()
+def create_inference_result(infer_text: str):
     img = Image.new("RGB", WIDE, BG)
     draw = ImageDraw.Draw(img)
-    draw.text((70, 55), "一键推理结果截图", font=F_TITLE, fill=INK)
-    draw.text((72, 125), "python3 infer.py --question \"Redis 的 AOF 和 RDB 持久化有什么区别？\"", font=F_SMALL, fill=MUTED)
-    shadow_card(draw, (80, 190, 1515, 790), radius=28, fill="#111827", outline="#111827")
-    draw.text((120, 230), "$ python3 infer.py --question 'Redis 的 AOF 和 RDB 持久化有什么区别？'", font=F_SMALL, fill="#A7F3D0")
-    draw.text((120, 295), "问题", font=F_H2, fill="#FCA5A5")
-    draw.text((120, 345), payload["question"], font=F_BODY, fill="#F9FAFB")
-    draw.text((120, 405), "答案", font=F_H2, fill="#FCA5A5")
-    answer = payload["answer"].replace("根据检索到的 Redis 文档，", "")
-    draw_wrapped(draw, answer, (120, 455), 46, F_SMALL, fill="#E5E7EB", spacing=7)
-    draw.text((930, 295), "来源", font=F_H2, fill="#FCA5A5")
-    y = 350
-    for i, source in enumerate(payload["sources"], start=1):
-        draw.text((930, y), f"[{i}] {source['doc_id']}", font=F_BODY, fill="#F9FAFB")
-        draw.text((930, y + 42), f"score={source['score']:.4f}", font=F_SMALL, fill="#93C5FD")
-        y += 95
+    draw.text((70, 55), "真实一键推理运行结果", font=F_TITLE, fill=INK)
+    draw.text((72, 125), "由脚本实际执行 infer.py 后生成，原始 stdout 保存到 outputs/run_logs/infer_stdout.txt", font=F_SMALL, fill=MUTED)
+    draw_terminal_panel(draw, infer_text, (80, 180, 1515, 805), "VS Code Terminal · infer.py actual stdout")
     img.save(OUT / "inference_result.png")
 
 
-def create_evaluation_chart():
+def create_evaluation_chart(eval_text: str):
     summary = json.loads((ROOT / "outputs/eval_results.json").read_text(encoding="utf-8")).get("summary", {})
-    if not summary:
-        subprocess.run([sys.executable, str(ROOT / "evaluate.py"), "--rebuild"], check=True)
-        summary = json.loads((ROOT / "outputs/eval_results.json").read_text(encoding="utf-8"))["summary"]
     img = Image.new("RGB", WIDE, BG)
     draw = ImageDraw.Draw(img)
-    draw.text((70, 60), "三维量化评估结果", font=F_TITLE, fill=INK)
-    draw.text((72, 130), "Context Relevance · Faithfulness · Answer Relevance", font=F_BODY, fill=MUTED)
+    draw.text((70, 55), "三维量化评估结果与真实运行输出", font=F_TITLE, fill=INK)
+    draw.text((72, 125), "evaluate.py 实际运行后写入 outputs/eval_results.json / csv", font=F_BODY, fill=MUTED)
     metrics = [
         ("Context Relevance", summary["context_relevance"], RED),
         ("Faithfulness", summary["faithfulness"], TEAL),
         ("Answer Relevance", summary["answer_relevance"], AMBER),
     ]
-    y = 250
+    y = 235
     for label, value, color in metrics:
-        draw.text((130, y - 10), label, font=F_H2, fill=INK)
-        draw.rounded_rectangle((520, y, 1320, y + 42), radius=20, fill="#E5E7EB")
-        draw.rounded_rectangle((520, y, 520 + int(800 * value), y + 42), radius=20, fill=color)
-        draw.text((1360, y - 2), f"{value:.4f}", font=F_H2, fill=INK)
-        y += 150
-    shadow_card(draw, (160, 720, 1440, 810), radius=24, fill="#FFFFFF", outline="#DDE5EF")
-    draw.text((205, 748), "结论：检索覆盖稳定，答案大部分能被上下文支持，关键词覆盖仍有优化空间。", font=F_BODY, fill=INK)
+        draw.text((105, y - 10), label, font=F_H2, fill=INK)
+        draw.rounded_rectangle((485, y, 1130, y + 42), radius=20, fill="#E5E7EB")
+        draw.rounded_rectangle((485, y, 485 + int(645 * value), y + 42), radius=20, fill=color)
+        draw.text((1170, y - 2), f"{value:.4f}", font=F_H2, fill=INK)
+        y += 115
+    draw_terminal_panel(draw, eval_text, (85, 555, 1515, 850), "VS Code Terminal · evaluate.py actual stdout")
     img.save(OUT / "evaluation_results.png")
 
 
-def create_retrieval_scores():
-    payload = get_infer_payload()
+def create_build_result(build_text: str):
     img = Image.new("RGB", WIDE, BG)
     draw = ImageDraw.Draw(img)
-    draw.text((70, 55), "检索命中文档与分数", font=F_TITLE, fill=INK)
-    draw.text((72, 125), "Top-k contexts expose combined/vector/BM25 scores for debugging", font=F_SMALL, fill=MUTED)
-    headers = ["Rank", "doc_id", "combined", "vector", "BM25"]
-    widths = [140, 520, 230, 230, 230]
+    draw.text((70, 55), "真实索引构建运行结果", font=F_TITLE, fill=INK)
+    draw.text((72, 125), "build_index.py 实际运行后生成 chunks.jsonl 与 vectors.jsonl", font=F_BODY, fill=MUTED)
+    draw_terminal_panel(draw, build_text, (80, 185, 1515, 790), "VS Code Terminal · build_index.py actual stdout")
+    img.save(OUT / "build_index_result.png")
+
+
+def create_retrieval_scores(payload: dict):
+    img = Image.new("RGB", WIDE, BG)
+    draw = ImageDraw.Draw(img)
+    draw.text((70, 55), "检索命中文档与二阶段重排序分数", font=F_TITLE, fill=INK)
+    draw.text((72, 125), "数据来自 infer.py --json 的真实输出：score = rerank_score，保留 hybrid/vector/BM25/coverage 便于调试", font=F_SMALL, fill=MUTED)
+    headers = ["Rank", "doc_id", "score", "hybrid", "rerank", "coverage"]
+    widths = [125, 455, 200, 200, 200, 210]
     x0, y0 = 120, 220
     row_h = 82
     x = x0
@@ -265,32 +294,40 @@ def create_retrieval_scores():
         draw.rectangle((x, y0, x + width, y0 + row_h), fill=RED, outline=LINE)
         draw.text((x + 22, y0 + 26), header, font=F_SMALL, fill="white")
         x += width
-    for r, item in enumerate(payload["retrieved"], start=1):
+    for r, item in enumerate(payload["retrieved_contexts"], start=1):
         y = y0 + r * row_h
         fill = "#FFFFFF" if r % 2 else "#F8FAFC"
         x = x0
         values = [
             str(r),
             item["doc_id"],
-            f"{item['combined']:.4f}",
-            f"{item['vector']:.4f}",
-            f"{item['bm25']:.4f}",
+            f"{item['score']:.4f}",
+            f"{item['combined_score']:.4f}",
+            f"{item['rerank_score']:.4f}",
+            f"{item['term_coverage']:.4f}",
         ]
         for value, width in zip(values, widths):
             draw.rectangle((x, y, x + width, y + row_h), fill=fill, outline=LINE)
             draw.text((x + 22, y + 26), value, font=F_SMALL, fill=INK)
             x += width
-    draw.text((120, 735), "redis:persistence 排名第一，说明 AOF/RDB 问题被正确定位到持久化文档。", font=F_BODY, fill=INK)
+    draw.text((120, 735), "redis:persistence 排名第一，说明 AOF/RDB 问题被正确定位到持久化文档；term_coverage 展示术语覆盖贡献。", font=F_BODY, fill=INK)
     img.save(OUT / "retrieval_scores.png")
 
 
 def main() -> None:
+    question = "Redis 的 AOF 和 RDB 持久化有什么区别？"
+    build_text = run_project_command(["build_index.py"], "build_index_stdout.txt")
+    infer_text = run_project_command(["infer.py", "--question", question], "infer_stdout.txt")
+    infer_payload = run_json_command(["infer.py", "--question", question, "--json"], "infer_json_stdout.txt")
+    eval_text = run_project_command(["evaluate.py", "--rebuild"], "evaluate_stdout.txt")
+
     create_hero()
     create_kb_overview()
     create_architecture_photo()
-    create_inference_result()
-    create_evaluation_chart()
-    create_retrieval_scores()
+    create_build_result(build_text)
+    create_inference_result(infer_text)
+    create_evaluation_chart(eval_text)
+    create_retrieval_scores(infer_payload)
     print(OUT)
 
 

@@ -37,3 +37,37 @@ def test_hybrid_retriever_ranks_exact_redis_terms_above_loose_similarity():
 
     assert results[0].chunk.doc_id == "redis:persistence"
     assert results[0].combined_score > results[1].combined_score
+
+
+def test_reranker_exposes_second_stage_score_for_term_coverage():
+    docs = [
+        Document(
+            doc_id="redis:persistence",
+            title="Redis RDB AOF persistence",
+            url="https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/",
+            text="RDB creates compact snapshots. AOF is an append only file that logs write commands for durability.",
+        ),
+        Document(
+            doc_id="redis:pubsub",
+            title="Redis Pub/Sub",
+            url="https://redis.io/docs/latest/develop/pubsub/",
+            text="Pub/Sub delivers messages to subscribers but does not persist messages for later replay.",
+        ),
+        Document(
+            doc_id="redis:streams",
+            title="Redis Streams",
+            url="https://redis.io/docs/latest/develop/data-types/streams/",
+            text="Streams keep append only event logs and support consumer groups for reliable processing.",
+        ),
+    ]
+    chunks = chunk_documents(docs, chunk_size=28, overlap=4)
+    retriever = HybridRetriever.from_chunks(
+        chunks,
+        embedder=HashingEmbeddingModel(dimensions=128),
+    )
+
+    results = retriever.search("AOF 和 RDB 持久化有什么区别", top_k=3)
+
+    assert results[0].chunk.doc_id == "redis:persistence"
+    assert results[0].rerank_score > results[0].combined_score
+    assert results[0].term_coverage > results[1].term_coverage

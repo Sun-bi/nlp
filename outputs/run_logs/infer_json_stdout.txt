@@ -1,0 +1,65 @@
+$ python3 infer.py --question Redis 的 AOF 和 RDB 持久化有什么区别？ --json
+{
+  "question": "Redis 的 AOF 和 RDB 持久化有什么区别？",
+  "answer": "根据检索到的 Redis 文档，Redis 提供 RDB 和 AOF 两类持久化机制 实际生产中可以同时开启 RDB 和 AOF，在恢复速度和数据安全之间取得平衡 RDB 会在指定条件下生成某一时刻的数据快照，文件紧凑，适合备份和快速恢复，但两次快照之间的数据可能丢失 AOF 以追加日志记录写命令，通常能提供更好的数据安全性，可以配置 appendfsync always、everysec 或 no [1]。以上回答仅基于列出的知识库片段。",
+  "sources": [
+    {
+      "doc_id": "redis:persistence",
+      "title": "Redis persistence with RDB and AOF",
+      "url": "https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/",
+      "score": 1.0819
+    }
+  ],
+  "retrieved_contexts": [
+    {
+      "doc_id": "redis:persistence",
+      "title": "Redis persistence with RDB and AOF",
+      "score": 1.0819,
+      "combined_score": 1.0,
+      "rerank_score": 1.0819,
+      "term_coverage": 0.3333,
+      "vector_score": 0.2655,
+      "bm25_score": 27.9998
+    },
+    {
+      "doc_id": "redis:pubsub",
+      "title": "Redis publish subscribe",
+      "score": 0.4678,
+      "combined_score": 0.4259,
+      "rerank_score": 0.4678,
+      "term_coverage": 0.1905,
+      "vector_score": 0.1246,
+      "bm25_score": 10.3143
+    },
+    {
+      "doc_id": "redis:overview",
+      "title": "Redis overview and use cases",
+      "score": 0.2015,
+      "combined_score": 0.1882,
+      "rerank_score": 0.2015,
+      "term_coverage": 0.0476,
+      "vector_score": 0.1023,
+      "bm25_score": 0.0525
+    },
+    {
+      "doc_id": "redis:sentinel",
+      "title": "Redis Sentinel high availability",
+      "score": 0.1912,
+      "combined_score": 0.1779,
+      "rerank_score": 0.1912,
+      "term_coverage": 0.0476,
+      "vector_score": 0.096,
+      "bm25_score": 0.0417
+    },
+    {
+      "doc_id": "redis:hashes",
+      "title": "Redis hashes",
+      "score": 0.1776,
+      "combined_score": 0.1643,
+      "rerank_score": 0.1776,
+      "term_coverage": 0.0476,
+      "vector_score": 0.0875,
+      "bm25_score": 0.0445
+    }
+  ]
+}

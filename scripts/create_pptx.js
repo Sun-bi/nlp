@@ -40,9 +40,9 @@ const C = {
 };
 
 const speaker = [
-  "# Redis-RAG 汇报逐页讲稿",
+  "# Redis-RAG 汇报演讲稿",
   "",
-  "说明：每一页都包含“页面内容”和“讲稿”。讲稿已经覆盖该页主要可见内容，可以在汇报时直接照着念，并根据现场时间删减。",
+  "下面是每页 PPT 对应的演讲者备注。放映时这些内容位于 PowerPoint 备注区，观众在投影画面中看不到。",
   "",
 ];
 
@@ -68,17 +68,14 @@ function addImagePanel(slide, name, x, y, w, h, outline = C.line) {
 }
 
 function addNotes(slide, page, title, visibleLines, notes) {
-  const visible = visibleLines.join("\n");
-  slide.addNotes(`第 ${page} 页：${title}\n\n页面内容：\n${visible}\n\n讲稿：\n${notes}`);
-  speaker.push(`## 第 ${page} 页：${title}`);
+  const visibleSummary = visibleLines.length
+    ? `这一页我还会顺着画面把这些信息讲清楚：${visibleLines.join("；")}。`
+    : "";
+  const fullNotes = `${notes}\n\n${visibleSummary}讲的时候不需要停留在单个词上，而是把它们串成“为什么这样设计、系统如何实现、结果说明什么”这条线索。`;
+  slide.addNotes(fullNotes);
+  speaker.push(`## ${title}`);
   speaker.push("");
-  speaker.push("### 页面内容");
-  speaker.push("");
-  visibleLines.forEach((line) => speaker.push(`- ${line}`));
-  speaker.push("");
-  speaker.push("### 讲稿");
-  speaker.push("");
-  speaker.push(notes);
+  speaker.push(fullNotes);
   speaker.push("");
 }
 
@@ -240,7 +237,7 @@ function addTableLike(slide, rows, x, y, w, h, headerFill = C.paleRed) {
   addCallout(slide, "目标：不是只演示概念，而是交付可运行、可解释、可评估的 RAG 仓库", 0.75, 1.25, 11.85, 0.62, C.redis);
   addCard(slide, 0.75, 2.25, 3.65, 2.05, "代码仓库", "README.md\nrequirements.txt\ninfer.py 一键推理\nbuild_index.py / evaluate.py", C.redis, 14.5);
   addCard(slide, 4.85, 2.25, 3.65, 2.05, "RAG 核心", "Redis 私有知识库\nChunking + Embedding\n本地向量库\nQuery Rewriting + Hybrid Retrieval", C.teal, 14.5);
-  addCard(slide, 8.95, 2.25, 3.65, 2.05, "展示材料", "论文式报告 MD/PDF\n15 页汇报 PPT\nPPT speaker notes\n逐页讲稿 Markdown", C.amber, 14.5);
+  addCard(slide, 8.95, 2.25, 3.65, 2.05, "展示材料", "论文式报告 MD/DOCX\n15 页汇报 PPT\n演讲者备注\n可直接朗读讲稿", C.amber, 14.5);
   addBullets(slide, [
     "知识库、检索、生成、评估四个环节均可单独运行和检查",
     "无 API key 时可复现；配置 DeepSeek 后可调用 deepseek-v4-pro",
@@ -248,9 +245,9 @@ function addTableLike(slide, rows, x, y, w, h, headerFill = C.paleRed) {
   ], 1.05, 5.05, 11.1, 0.95, 15.5);
   addNotes(slide, 2, "作业要求与本项目交付", [
     "本项目交付完整代码仓库",
-    "核心 RAG 模块包括知识库、Chunking、Embedding、向量库、混合检索和生成",
-    "展示材料包括报告、PPT 和逐页讲稿",
-  ], "这一页说明作业要求和项目交付之间的对应关系。代码仓库里有 README、requirements 和 infer.py，满足一键运行要求。RAG 核心部分包括 Redis 私有知识库、文档分块、embedding、本地向量库、Query Rewriting 和混合检索。展示材料方面，我补充了论文式报告、PDF、15页PPT和逐页讲稿，所以这个项目既可以运行，也可以完整展示。");
+    "核心 RAG 模块包括知识库、Chunking、Embedding、向量库、混合检索、轻量重排序和生成",
+    "展示材料包括报告 Word、PPT、演讲者备注和讲稿",
+  ], "这一页说明作业要求和项目交付之间的对应关系。代码仓库里有 README、requirements 和 infer.py，满足一键运行要求。RAG 核心部分包括 Redis 私有知识库、文档分块、embedding、本地向量库、Query Rewriting、BM25/Vector 混合检索以及轻量重排序。展示材料方面，我把报告整理成 Markdown 和可编辑 Word，同时生成 PPT、演讲者备注和单独讲稿，所以这个项目既可以运行，也可以完整展示。");
 }
 
 // Slide 3
@@ -303,22 +300,7 @@ function addTableLike(slide, rows, x, y, w, h, headerFill = C.paleRed) {
 {
   const slide = pptx.addSlide();
   addHeader(slide, "知识库主题覆盖", "03 数据构建", 5);
-  const topics = [
-    ["基础数据结构", "String / Hash / List / Stream / Sorted Set"],
-    ["生命周期", "EXPIRE / TTL / PERSIST / 惰性删除 / 周期删除"],
-    ["可靠性", "RDB / AOF / appendfsync / 备份恢复"],
-    ["高可用与扩展", "Replication / Sentinel / Cluster / hash slot"],
-    ["编程与消息", "MULTI / EXEC / WATCH / Lua / Pub/Sub / Stream"],
-    ["缓存工程", "缓存穿透 / 缓存击穿 / 缓存雪崩 / 随机 TTL"],
-  ];
-  topics.forEach((t, i) => {
-    const x = 0.85 + (i % 2) * 6.05;
-    const y = 1.3 + Math.floor(i / 2) * 1.55;
-    addCard(slide, x, y, 5.45, 1.16, t[0], t[1], i % 2 === 0 ? C.redis : C.teal, 14.2);
-  });
-  slide.addShape(pptx.ShapeType.roundRect, { x: 0.95, y: 6.1, w: 11.4, h: 0.52, rectRadius: 0.04, fill: { color: C.paleRed }, line: { color: "F8C5BD" } });
-  slide.addText("覆盖原则：问题要能从知识库中找到依据，答案要能回溯到文档，而不是依赖模型记忆。", { x: 1.2, y: 6.25, w: 10.9, h: 0.2, ...font(14.8, C.redisDark, true), fit: "shrink" });
-  addImagePanel(slide, "knowledge_base_overview.png", 0.72, 1.16, 11.95, 5.82, C.line);
+  addImagePanel(slide, "knowledge_base_overview.png", 0.72, 1.18, 11.95, 5.78, C.line);
   addNotes(slide, 5, "知识库主题覆盖", [
     "基础数据结构：String、Hash、List、Stream、Sorted Set",
     "生命周期：EXPIRE、TTL、PERSIST",
@@ -326,7 +308,7 @@ function addTableLike(slide, rows, x, y, w, h, headerFill = C.paleRed) {
     "高可用与扩展：Replication、Sentinel、Cluster",
     "编程与消息：事务、Lua、Pub/Sub、Stream",
     "缓存工程：缓存穿透、击穿和雪崩",
-  ], "这一页说明知识库覆盖面。Redis 不是只收集几个命令，而是覆盖了数据结构、生命周期、可靠性、高可用、编程能力和缓存工程。这样设计的好处是评估问题可以比较全面，比如既能问 AOF 和 RDB，也能问 Stream 和 Pub/Sub，或者问缓存击穿怎么缓解。覆盖原则是每个问题都应该能从知识库中找到依据。");
+  ], "这一页说明知识库覆盖面。Redis 不是只收集几个命令，而是覆盖了数据结构、生命周期、可靠性、高可用、编程能力和缓存工程。这样设计的好处是评估问题可以比较全面，比如既能问 AOF 和 RDB，也能问 Stream 和 Pub/Sub，或者问缓存击穿怎么缓解。覆盖原则是每个问题都应该能从知识库中找到依据，答案也要能回溯到文档来源，而不是让模型凭印象发挥。");
 }
 
 // Slide 6
@@ -414,32 +396,14 @@ function addTableLike(slide, rows, x, y, w, h, headerFill = C.paleRed) {
 {
   const slide = pptx.addSlide();
   addHeader(slide, "端到端系统架构", "07 系统流程", 10);
-  addFlowBox(slide, "文档\nJSONL", 0.55, 1.35, 1.35, 0.78, "FFFFFF");
-  addArrow(slide, 1.95, 1.74, 2.3, 1.74);
-  addFlowBox(slide, "Chunking", 2.3, 1.35, 1.45, 0.78, C.paleRed);
-  addArrow(slide, 3.8, 1.74, 4.15, 1.28);
-  addArrow(slide, 3.8, 1.74, 4.15, 2.18);
-  addFlowBox(slide, "Embedding", 4.15, 0.88, 1.45, 0.72, C.paleBlue, C.blue);
-  addFlowBox(slide, "BM25", 4.15, 1.8, 1.45, 0.72, C.paleGreen, C.teal);
-  addArrow(slide, 5.65, 1.24, 6.2, 1.62);
-  addArrow(slide, 5.65, 2.16, 6.2, 1.9);
-  addFlowBox(slide, "Hybrid\nRetriever", 6.2, 1.35, 1.65, 0.78, "FFFFFF");
-  addArrow(slide, 7.9, 1.74, 8.25, 1.74);
-  addFlowBox(slide, "Top-k\nContexts", 8.25, 1.35, 1.45, 0.78, C.paleRed);
-  addArrow(slide, 9.75, 1.74, 10.1, 1.74);
-  addFlowBox(slide, "DeepSeek /\nFallback", 10.1, 1.35, 1.65, 0.78, C.paleBlue, C.blue);
-  addArrow(slide, 11.8, 1.74, 12.15, 1.74);
-  addFlowBox(slide, "带引用\n答案", 12.15, 1.35, 0.9, 0.78, "FFFFFF");
-  addCard(slide, 0.85, 3.45, 3.7, 1.55, "可观测", "输出 retrieved_contexts，展示 doc_id、title、combined_score、vector_score 和 bm25_score。", C.redis, 13.8);
-  addCard(slide, 4.85, 3.45, 3.7, 1.55, "可替换", "Embedding、向量库、生成模型都以模块封装，后续可替换为 BGE、FAISS、reranker。", C.teal, 13.8);
-  addCard(slide, 8.85, 3.45, 3.7, 1.55, "可复现", "无 API key 自动回退抽取式生成，保证老师本地也能运行完整流程。", C.amber, 13.8);
-  addImagePanel(slide, "architecture_flow.png", 0.62, 1.14, 12.08, 5.58, C.line);
+  addImagePanel(slide, "architecture_flow.png", 0.62, 1.14, 12.08, 5.6, C.line);
   addNotes(slide, 10, "端到端系统架构", [
     "文档 JSONL 经过 Chunking 后进入 Embedding 和 BM25",
     "用户问题经过 Query Rewriting 后进入 Hybrid Retriever",
-    "Top-k 上下文传入 DeepSeek 或抽取式生成器",
-    "输出带引用答案和检索分数",
-  ], "这一页展示端到端架构。左边是文档处理和索引构建，文档先变成 chunk，再进入 embedding 和 BM25。右边是在线问答流程，用户问题先经过 Query Rewriting，然后由 Hybrid Retriever 找到 Top-k 上下文，最后传给 DeepSeek 或抽取式生成器。系统还会输出检索分数，便于分析为什么选中某个文档。");
+    "Top-k 候选经过轻量 reranker 二次排序",
+    "最终上下文传入 DeepSeek 或抽取式生成器",
+    "输出带引用答案和可解释检索分数",
+  ], "这一页展示端到端架构。左边是文档处理和索引构建，文档先变成 chunk，再进入 embedding 和 BM25。右边是在线问答流程，用户问题先经过 Query Rewriting，然后由 Hybrid Retriever 找到候选上下文，再经过轻量 reranker 根据术语覆盖率和标题覆盖率做二次排序。最后系统把高质量上下文传给 DeepSeek 或抽取式生成器，并输出带引用答案。这样设计的重点是可观测、可替换和可复现：检索分数能看到，embedding 和向量库能替换，没有 API key 时也能跑完整流程。");
 }
 
 // Slide 11
@@ -480,58 +444,43 @@ function addTableLike(slide, rows, x, y, w, h, headerFill = C.paleRed) {
 {
   const slide = pptx.addSlide();
   addHeader(slide, "实验结果与解释", "09 评估方案", 13);
-  addMetricBar(slide, "Context Relevance", 1.0, 0.9, 1.55, 6.0, C.redis);
-  addMetricBar(slide, "Faithfulness", 0.8116, 0.9, 2.75, 6.0, C.teal);
-  addMetricBar(slide, "Answer Relevance", 0.875, 0.9, 3.95, 6.0, C.amber);
-  addCard(slide, 8.95, 1.25, 3.45, 1.35, "检索表现", "相关文档覆盖率达到 1.0000，说明混合检索能稳定召回正确文档。", C.redis, 13.5);
-  addCard(slide, 8.95, 2.95, 3.45, 1.35, "生成表现", "Faithfulness 为 0.8116，答案多数内容可由上下文支持。", C.teal, 13.5);
-  addCard(slide, 8.95, 4.65, 3.45, 1.35, "剩余问题", "部分关键词未完全覆盖，主要来自抽取式答案表达不够自然。", C.amber, 13.5);
-  addImagePanel(slide, "evaluation_results.png", 0.55, 1.12, 7.8, 5.45, C.line);
+  addImagePanel(slide, "evaluation_results.png", 0.62, 1.12, 12.08, 5.72, C.line);
   addNotes(slide, 13, "实验结果与解释", [
     "Context Relevance = 1.0000",
-    "Faithfulness = 0.8116",
+    "Faithfulness = 0.8159",
     "Answer Relevance = 0.8750",
     "检索效果较稳，答案忠实度较好，部分关键词覆盖仍可提升",
-  ], "这一页展示实验结果。Context Relevance 是 1.0000，说明在当前评估集里，检索能覆盖相关文档。Faithfulness 是 0.8116，说明答案大多数内容都能被上下文支持。Answer Relevance 是 0.8750，说明答案基本覆盖问题要点，但还有提升空间。主要问题是抽取式生成有时表达比较硬，可能没有覆盖所有期望关键词。");
+  ], "这一页展示实验结果。图里的数值不是手工写的，而是实际运行 evaluate.py --rebuild 后从 outputs/eval_results.json 中读取并生成的。Context Relevance 是 1.0000，说明在当前评估集里，检索能覆盖相关文档。Faithfulness 是 0.8159，说明答案大多数内容都能被上下文支持。Answer Relevance 是 0.8750，说明答案基本覆盖问题要点，但还有提升空间。主要问题是抽取式生成有时表达比较硬，可能没有覆盖所有期望关键词；如果接入 DeepSeek 并加强引用校验，表达自然度会进一步提升。");
 }
 
 // Slide 14
 {
   const slide = pptx.addSlide();
   addHeader(slide, "案例分析：AOF 与 RDB 持久化问答", "10 案例与反思", 14);
-  slide.addShape(pptx.ShapeType.roundRect, { x: 0.85, y: 1.25, w: 11.65, h: 0.65, rectRadius: 0.04, fill: { color: C.paleRed }, line: { color: "F8C5BD" } });
-  slide.addText("问题：Redis 的 AOF 和 RDB 持久化有什么区别？", { x: 1.15, y: 1.45, w: 10.9, h: 0.22, ...font(16, C.redisDark, true), fit: "shrink" });
-  addCard(slide, 0.9, 2.35, 3.65, 2.2, "命中文档", "redis:persistence\nRedis persistence with RDB and AOF\ncombined_score = 1.0000", C.redis, 14);
-  addCard(slide, 4.85, 2.35, 3.65, 2.2, "答案要点", "RDB 是快照，文件紧凑，适合备份和快速恢复；AOF 是追加日志，记录写命令，数据安全性更好。", C.teal, 14);
-  addCard(slide, 8.8, 2.35, 3.65, 2.2, "为什么能命中", "Query Rewriting 扩展 persistence、snapshot、append only file；BM25 强命中 AOF/RDB。", C.amber, 14);
-  slide.addText("这个案例体现：Redis 问答需要同时处理中文表达、英文术语和精确命令名。", { x: 0.95, y: 5.45, w: 11.2, h: 0.28, ...font(16.2, C.ink, true), fit: "shrink" });
-  addImagePanel(slide, "inference_result.png", 0.72, 2.08, 12.0, 4.78, C.line);
+  addImagePanel(slide, "inference_result.png", 0.62, 1.12, 12.08, 5.72, C.line);
   addNotes(slide, 14, "案例分析：AOF 与 RDB 持久化问答", [
     "问题是 Redis 的 AOF 和 RDB 持久化有什么区别",
     "系统命中文档 redis:persistence",
+    "最终 score = 1.0819，说明 rerank 在 hybrid score 基础上加入术语覆盖奖励",
     "答案包含 RDB 快照、AOF 追加日志、备份恢复和数据安全性",
-    "命中原因是 Query Rewriting 和 BM25 精确术语匹配",
-  ], "这一页用 AOF 和 RDB 问题做案例。系统最终命中了 redis:persistence 文档，combined_score 是 1.0000。答案能解释 RDB 是快照，适合备份和快速恢复；AOF 是追加日志，通常数据安全性更好。这个案例能说明 Query Rewriting 和 BM25 的价值：中文问题会扩展到 persistence、snapshot 和 append only file，同时 AOF 和 RDB 被精确命中。");
+    "命中原因是 Query Rewriting、BM25 精确术语匹配和轻量重排序共同作用",
+  ], "这一页用 AOF 和 RDB 问题做案例。这里放的是脚本真实运行输出，不是后期编造的截图。系统最终命中了 redis:persistence 文档，最终 score 是 1.0819，其中 hybrid combined_score 是 1.0000，reranker 又根据 AOF、RDB、persistence 等术语覆盖给了额外奖励。答案解释了 RDB 是快照，适合备份和快速恢复；AOF 是追加日志，通常数据安全性更好。这个案例能说明 Query Rewriting、BM25 精确术语匹配和轻量重排序的价值：中文问题会扩展到 persistence、snapshot 和 append only file，同时 AOF 和 RDB 被精确命中。");
 }
 
 // Slide 15
 {
   const slide = pptx.addSlide();
-  addHeader(slide, "Bad Case、改进方向与总结", "11 总结", 15);
-  addCard(slide, 0.75, 1.25, 3.75, 2.0, "Bad Case", "AOF/RDB 问题早期会召回 Pub/Sub，因为 Pub/Sub 文档中也出现“不会持久化”。说明共现词会造成弱相关上下文污染。", C.redis, 13.5);
-  addCard(slide, 4.8, 1.25, 3.75, 2.0, "已做改进", "加入 Query Rewriting、BM25/Vector 融合，以及生成阶段上下文分数过滤，减少弱相关片段进入答案。", C.teal, 13.5);
-  addCard(slide, 8.85, 1.25, 3.75, 2.0, "后续优化", "替换 BGE embedding；加入 reranker；扩展评估集；增加 LLM 生成后的 citation checking。", C.amber, 13.5);
-  slide.addShape(pptx.ShapeType.roundRect, { x: 0.9, y: 4.05, w: 11.55, h: 1.35, rectRadius: 0.04, fill: { color: "FFFFFF" }, line: { color: C.line } });
-  slide.addText("复现实验命令", { x: 1.2, y: 4.35, w: 2.2, h: 0.25, ...font(15, C.redisDark, true) });
-  slide.addText("python3 infer.py --question \"Redis 的 AOF 和 RDB 持久化有什么区别？\"\npython3 evaluate.py --rebuild", { x: 1.2, y: 4.82, w: 9.8, h: 0.48, ...font(12.5, C.ink, false), fontFace: "Courier New", fit: "shrink" });
-  addImagePanel(slide, "retrieval_scores.png", 0.74, 3.56, 11.9, 2.65, C.line);
-  slide.addText("总结：本项目完成了 Redis 私有知识库、检索增强生成、DeepSeek 接入、三维评估和完整展示材料。", { x: 0.95, y: 6.32, w: 11.5, h: 0.3, ...font(15.2, C.ink, true), fit: "shrink" });
+  addHeader(slide, "检索分数、Bad Case 与总结", "11 总结", 15);
+  addImagePanel(slide, "retrieval_scores.png", 0.62, 1.12, 12.08, 4.66, C.line);
+  addCard(slide, 0.75, 5.98, 3.75, 0.98, "Bad Case", "Pub/Sub 含“不会持久化”，容易成为弱相关召回。", C.redis, 12.2);
+  addCard(slide, 4.8, 5.98, 3.75, 0.98, "已做改进", "Query Rewriting + Hybrid Retrieval + Rerank。", C.teal, 12.2);
+  addCard(slide, 8.85, 5.98, 3.75, 0.98, "后续方向", "BGE、FAISS/Chroma、更大评估集和 citation checking。", C.amber, 12.2);
   addNotes(slide, 15, "Bad Case、改进方向与总结", [
-    "Bad Case：AOF/RDB 问题早期召回 Pub/Sub 弱相关文档",
-    "已做改进：Query Rewriting、混合检索、上下文过滤",
-    "后续优化：BGE embedding、reranker、更大评估集、citation checking",
-    "复现实验命令：infer.py 和 evaluate.py",
-  ], "最后一页总结问题和改进。一个典型 bad case 是 AOF/RDB 问题早期会召回 Pub/Sub，因为它也出现了持久化相关词。为了解决这个问题，我加入了 Query Rewriting、混合检索和生成阶段上下文过滤。后续可以进一步替换 BGE embedding、增加 reranker、扩大评估集，并对 LLM 输出做引用一致性检查。总体来说，这个项目完成了从知识库到检索、生成、评估和展示的完整闭环。");
+    "真实 JSON 输出展示 score、combined_score、rerank_score 和 term_coverage",
+    "Bad Case：AOF/RDB 问题仍会召回 Pub/Sub 弱相关文档",
+    "已做改进：Query Rewriting、混合检索、轻量重排序和上下文过滤",
+    "后续优化：BGE embedding、FAISS/Chroma、更大评估集、citation checking",
+  ], "最后一页总结问题和改进。表格来自 infer.py --json 的真实输出，可以看到 redis:persistence 排名第一，score 和 rerank_score 都是 1.0819，term_coverage 明显高于其他候选。一个典型 bad case 是 AOF/RDB 问题仍会召回 Pub/Sub，因为 Pub/Sub 文档也出现了“不会持久化”这类词。为了解决这个问题，我加入了 Query Rewriting、BM25/Vector 混合检索、轻量重排序和生成阶段上下文过滤。后续可以进一步替换 BGE embedding，接入 FAISS 或 Chroma，扩大评估集，并对 DeepSeek 输出做 citation checking。总体来说，这个项目完成了从知识库到检索、生成、评估和展示的完整闭环。");
 }
 
 async function main() {

@@ -1,0 +1,7 @@
+$ python3 evaluate.py --rebuild
+Redis RAG evaluation
+Samples: 10
+Context Relevance: 1.0000
+Faithfulness: 0.8159
+Answer Relevance: 0.8750
+Saved outputs to: outputs

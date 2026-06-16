@@ -1,7 +1,7 @@
 {
   "summary": {
     "context_relevance": 1.0,
-    "faithfulness": 0.8116,
+    "faithfulness": 0.8159,
     "answer_relevance": 0.875
   },
   "rows": [
@@ -72,7 +72,7 @@
     {
       "question": "Redis 内存达到 maxmemory 后会发生什么？",
       "context_relevance": 1.0,
-      "faithfulness": 0.4714,
+      "faithfulness": 0.5143,
       "answer_relevance": 0.5,
       "answer": "根据检索到的 Redis 文档，当 Redis 使用内存达到 maxmemory 限制时，会根据 maxmemory-policy 执行内存淘汰 [1]。以上回答仅基于列出的知识库片段。",
       "sources": "redis:eviction"

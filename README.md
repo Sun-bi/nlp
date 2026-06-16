@@ -13,7 +13,7 @@
 | Embedding 模型 | 默认使用可复现的 hashing embedding；文档中说明如何替换为 BGE/SentenceTransformer |
 | 向量数据库 | `data/index/vectors.jsonl` 保存 chunk 向量和元数据，作为本地向量库 |
 | LLM 生成 | 支持 DeepSeek / OpenAI-compatible API；无 key 时使用抽取式生成器保证可复现 |
-| 高级 RAG 策略 | Query Rewriting + BM25/Vector Hybrid Retrieval |
+| 高级 RAG 策略 | Query Rewriting + BM25/Vector Hybrid Retrieval + Lightweight Reranking |
 | 三维量化评估 | Context Relevance、Faithfulness、Answer Relevance |
 | 一键推理脚本 | `python3 infer.py --question "..."` |
 
@@ -53,14 +53,14 @@ Redis 是一个很适合做 RAG 作业的技术领域，原因有三点。
 │   └── index/                        # 构建后的 chunk 和向量索引
 ├── scripts/
 │   ├── collect_redis_docs.py         # 从 Redis 官方文档页面收集语料
-│   ├── create_report_pdf.py          # 报告 PDF 生成脚本
+│   ├── create_report_docx.py         # 可编辑 Word 报告生成脚本
 │   └── create_pptx.js                # PPT 和讲稿生成脚本
 ├── outputs/
 │   ├── eval_results.json             # 评估结果 JSON
 │   └── eval_results.csv              # 评估结果 CSV
 ├── report/
 │   ├── redis_rag_report.md           # 论文式报告 Markdown
-│   └── redis_rag_report.pdf          # 论文式报告 PDF
+│   └── redis_rag_report.docx         # 可编辑 Word 报告
 └── slides/
     ├── redis_rag_presentation.pptx   # 汇报 PPT
     └── redis_rag_speaker_script.md   # 逐页讲稿
@@ -74,7 +74,7 @@ Redis 是一个很适合做 RAG 作业的技术领域，原因有三点。
 python3 -m pip install -r requirements.txt
 ```
 
-核心 RAG 链路只使用 Python 标准库即可运行。`requirements.txt` 中的额外依赖主要用于测试、报告 PDF 和 PPT 生成。
+核心 RAG 链路只使用 Python 标准库即可运行。`requirements.txt` 中的额外依赖主要用于测试、Word 报告、PPT 和展示图片生成。
 
 ## 5. 快速开始
 
@@ -131,7 +131,7 @@ python3 evaluate.py --rebuild
 | 指标 | 分数 | 含义 |
 |---|---:|---|
 | Context Relevance | 1.0000 | 检索结果覆盖了标注相关文档 |
-| Faithfulness | 0.8116 | 答案中大部分内容能被上下文支持 |
+| Faithfulness | 0.8159 | 答案中大部分内容能被上下文支持 |
 | Answer Relevance | 0.8750 | 答案覆盖了多数期望关键词 |
 
 评估结果会保存到：
@@ -243,7 +243,17 @@ score = 0.45 * normalized_vector_score + 0.55 * normalized_bm25_score
 
 为什么 BM25 权重略高？因为 Redis 问答中精确术语非常重要。例如用户问 “AOF 和 RDB 的区别”，如果检索系统没有命中 `AOF` 和 `RDB`，即使语义相似也很难回答准确。
 
-### 7.5 生成模块
+### 7.5 轻量重排序
+
+为了让项目不只是“检索后直接生成”，系统增加了二阶段轻量重排序。Hybrid Retrieval 先给出候选片段，reranker 再根据查询术语覆盖率和标题覆盖率进行加分：
+
+```text
+rerank_score = combined_score + 0.20 * term_coverage + 0.08 * title_coverage
+```
+
+`infer.py --json` 会输出 `score`、`combined_score`、`rerank_score`、`term_coverage`、`vector_score` 和 `bm25_score`，便于解释为什么某个文档排在前面。
+
+### 7.6 生成模块
 
 系统支持两种生成方式：
 
@@ -274,9 +284,10 @@ flowchart LR
     H --> J[BM25 Search]
     I --> K[Score Fusion]
     J --> K
-    K --> L[Top-k Contexts]
-    L --> M[DeepSeek 或抽取式生成]
-    M --> N[带引用答案]
+    K --> L[Lightweight Reranking]
+    L --> M[Context Filtering]
+    M --> N[DeepSeek 或抽取式生成]
+    N --> O[带引用答案]
 ```
 
 ## 9. 评估方法
@@ -332,6 +343,10 @@ Redis 的 AOF 和 RDB 持久化有什么区别？
 ```text
 redis:persistence
 Redis persistence with RDB and AOF
+score=1.0819
+combined_score=1.0000
+rerank_score=1.0819
+term_coverage=0.3333
 ```
 
 生成答案会说明：
@@ -374,10 +389,12 @@ PYTHONPATH=src python3 -m pytest tests -q
 - `infer.py`：一键推理脚本
 - `build_index.py`：索引构建脚本
 - `evaluate.py`：量化评估脚本
-- `report/redis_rag_report.md`：论文式报告
-- `report/redis_rag_report.pdf`：PDF 报告
+- `report/redis_rag_report.md`：论文式报告 Markdown
+- `report/redis_rag_report.docx`：可编辑 Word 报告
 - `slides/redis_rag_presentation.pptx`：汇报 PPT
-- `slides/redis_rag_speaker_script.md`：逐页讲稿
+- `slides/redis_rag_speaker_script.md`：可直接朗读的完整讲稿
+- `slides/assets/`：架构图、知识库图、真实运行结果截图
+- `outputs/run_logs/`：生成展示图片时保存的真实命令输出
 
 ## 14. 重新生成报告、图片和 PPT
 
@@ -390,15 +407,17 @@ python3 evaluate.py --rebuild
 # 2. 生成 PPT 中使用的介绍图和结果截图
 python3 scripts/create_visual_assets.py
 
-# 3. 生成论文式 PDF 报告
-python3 scripts/create_report_pdf.py
+# 3. 生成可编辑 Word 报告
+python3 scripts/create_report_docx.py
 
 # 4. 生成 PPT 和逐页讲稿
 npm install
 npm run slides
 ```
 
-普通提交作业时不需要重新生成，仓库中已经包含生成好的 PDF、PPT、讲稿和图片资产。
+普通提交作业时不需要重新生成，仓库中已经包含生成好的 DOCX、PPT、讲稿和图片资产。
+
+PPT 的演讲稿已经写入 PowerPoint 备注区。汇报时请使用 PowerPoint 的“演讲者视图”，投影画面只显示幻灯片，备注内容只会显示在你自己的电脑屏幕上。
 
 ## 15. 局限与后续工作
 
@@ -412,7 +431,7 @@ npm run slides
 后续可以继续扩展：
 
 - 替换为 BGE embedding 并接入 FAISS 或 Chroma。
-- 增加 reranker，例如 BGE reranker 或 cross-encoder。
+- 将当前轻量 reranker 升级为 BGE reranker 或 cross-encoder。
 - 增加更多真实用户问题和人工评分。
 - 对比 pure vector、BM25、hybrid retrieval 三种策略。
 - 在 DeepSeek 生成后加入自动 citation checking。

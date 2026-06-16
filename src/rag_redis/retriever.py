@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Dict, Iterable, List, Sequence
 
 from .chunking import Chunk
@@ -20,6 +20,13 @@ class RetrievalResult:
     vector_score: float
     bm25_score: float
     combined_score: float
+    rerank_score: float = 0.0
+    term_coverage: float = 0.0
+    title_coverage: float = 0.0
+
+    @property
+    def final_score(self) -> float:
+        return self.rerank_score if self.rerank_score > 0 else self.combined_score
 
 
 class BM25Index:
@@ -83,6 +90,7 @@ class HybridRetriever:
         vector_weight: float = 0.45,
         bm25_weight: float = 0.55,
         enable_query_rewrite: bool = True,
+        enable_rerank: bool = True,
     ) -> None:
         self.chunks = list(chunks)
         self.embedder = embedder
@@ -91,6 +99,7 @@ class HybridRetriever:
         self.vector_weight = vector_weight
         self.bm25_weight = bm25_weight
         self.enable_query_rewrite = enable_query_rewrite
+        self.enable_rerank = enable_rerank
 
     @classmethod
     def from_chunks(
@@ -100,6 +109,7 @@ class HybridRetriever:
         vector_weight: float = 0.45,
         bm25_weight: float = 0.55,
         enable_query_rewrite: bool = True,
+        enable_rerank: bool = True,
     ) -> "HybridRetriever":
         actual_embedder = embedder or HashingEmbeddingModel()
         vector_store = LocalVectorStore.from_chunks(chunks, actual_embedder)
@@ -110,6 +120,7 @@ class HybridRetriever:
             vector_weight=vector_weight,
             bm25_weight=bm25_weight,
             enable_query_rewrite=enable_query_rewrite,
+            enable_rerank=enable_rerank,
         )
 
     def search(self, question: str, top_k: int = 5) -> List[RetrievalResult]:
@@ -139,4 +150,40 @@ class HybridRetriever:
                 )
             )
         results.sort(key=lambda result: result.combined_score, reverse=True)
-        return results[:top_k]
+        if not self.enable_rerank:
+            return results[:top_k]
+        return self._rerank(results, tokenize(rewritten), top_k=top_k)
+
+    def _rerank(
+        self,
+        results: Sequence[RetrievalResult],
+        query_tokens: Sequence[str],
+        top_k: int,
+    ) -> List[RetrievalResult]:
+        query_set = set(query_tokens)
+        if not query_set:
+            return list(results[:top_k])
+
+        pool_size = max(top_k * 3, top_k)
+        candidate_pool = results[:pool_size]
+        reranked: List[RetrievalResult] = []
+        for result in candidate_pool:
+            chunk_tokens = set(result.chunk.tokens)
+            title_tokens = set(tokenize(result.chunk.source_title))
+            term_coverage = len(query_set.intersection(chunk_tokens)) / len(query_set)
+            title_coverage = len(query_set.intersection(title_tokens)) / len(query_set)
+            rerank_score = result.combined_score + 0.20 * term_coverage + 0.08 * title_coverage
+            reranked.append(
+                replace(
+                    result,
+                    rerank_score=rerank_score,
+                    term_coverage=term_coverage,
+                    title_coverage=title_coverage,
+                )
+            )
+
+        reranked.sort(
+            key=lambda result: (result.rerank_score, result.combined_score),
+            reverse=True,
+        )
+        return reranked[:top_k]

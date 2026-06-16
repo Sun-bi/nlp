@@ -37,9 +37,9 @@ class ExtractiveGenerator:
                 sources=[],
             )
 
-        max_score = max(result.combined_score for result in contexts) or 1.0
+        max_score = max(result.final_score for result in contexts) or 1.0
         grounded_contexts = [
-            result for result in contexts if result.combined_score >= max_score * 0.5
+            result for result in contexts if result.final_score >= max_score * 0.5
         ] or [contexts[0]]
         question_tokens = set(tokenize(question))
         selected_sentences: List[str] = []
@@ -52,7 +52,7 @@ class ExtractiveGenerator:
                     doc_id=chunk.doc_id,
                     title=chunk.source_title,
                     url=chunk.url,
-                    score=result.combined_score,
+                    score=result.final_score,
                 )
             )
             sentences = _split_sentences(chunk.text)
@@ -138,7 +138,7 @@ class OpenAICompatibleGenerator:
                 doc_id=result.chunk.doc_id,
                 title=result.chunk.source_title,
                 url=result.chunk.url,
-                score=result.combined_score,
+                score=result.final_score,
             )
             for result in contexts[:5]
         ]

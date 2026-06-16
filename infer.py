@@ -54,7 +54,10 @@ def main() -> None:
             {
                 "doc_id": result.chunk.doc_id,
                 "title": result.chunk.source_title,
-                "score": round(result.combined_score, 4),
+                "score": round(result.final_score, 4),
+                "combined_score": round(result.combined_score, 4),
+                "rerank_score": round(result.rerank_score, 4),
+                "term_coverage": round(result.term_coverage, 4),
                 "vector_score": round(result.vector_score, 4),
                 "bm25_score": round(result.bm25_score, 4),
             }
