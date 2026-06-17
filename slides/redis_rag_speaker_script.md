@@ -4,68 +4,64 @@
 
 ## 封面
 
-这一页是汇报封面。我的作业选题是 Redis 垂直领域问答系统。核心思路是把 Redis 官方文档和清洗后的技术语料构造成私有知识库，然后通过 RAG 的方式进行检索增强生成。系统不仅包含一键推理脚本，也包含索引构建、量化评估、报告和 PPT。后面我会按照数据、检索、生成、评估和案例分析的顺序展开。 这一页我会顺着画面把这些信息讲清楚：Redis-RAG：基于 RAG 的 Redis 垂直领域深度问答系统；关键词：私有知识库、混合检索、DeepSeek 生成、三维量化评估；交付物：代码仓库、README、依赖文件、一键推理、报告、PPT、讲稿。讲的时候我会把它们串成“为什么这样设计、系统如何实现、结果说明什么”这条线索，整页讲完后自然过渡到下一页。
-
-## 作业要求与本项目交付
-
-这一页说明作业要求和项目交付之间的对应关系。代码仓库里有 README、requirements 和 infer.py，满足一键运行要求；RAG 核心部分包括 Redis 私有知识库、文档分块、embedding、本地向量库、Query Rewriting、BM25/Vector 混合检索、轻量重排序和引用检查；另外我补充了 BGE embedding、FAISS 和 Chroma 的可选适配，加入 20 条评估问题和检索策略消融对比，展示材料也包括可编辑 Word 报告、PPT、演讲者备注和单独讲稿。 这一页我会顺着画面把这些信息讲清楚：本项目交付完整代码仓库；核心 RAG 模块包括知识库、Chunking、Embedding、向量库、混合检索、重排序、引用检查和生成；展示材料包括报告 Word、PPT、演讲者备注和讲稿。讲的时候我会把它们串成“为什么这样设计、系统如何实现、结果说明什么”这条线索，整页讲完后自然过渡到下一页。
+大家好，我这次汇报的题目是基于 RAG 的 Redis 垂直领域深度问答系统。这个项目的核心目标不是简单调用大模型回答 Redis 问题，而是先把 Redis 官方文档和清洗后的技术语料构造成一个私有知识库，再通过检索增强生成的方式让答案有依据、有来源、可评估。整套仓库包含索引构建、一键推理、量化评估、检索消融、报告和 PPT。后面的汇报我会按照为什么选 Redis、知识库如何构建、RAG 链路怎么设计、实验结果说明什么、以及 Bad Case 如何分析这条线来讲。这里我会先把整体定位说清楚：它既是一个能运行的工程项目，也是一个可以解释 RAG 每个环节作用的课程作业。这样开场可以让老师知道后面的 PPT 不是单纯展示结果，而是在证明系统确实从数据、检索、生成到评估都做完整了。
 
 ## 为什么选 Redis 作为垂直领域
 
-我选择 Redis 是因为它很适合作为垂直领域。第一，Redis 的知识边界清楚，主题从数据结构到持久化和集群都很明确。第二，Redis 问答里有很多精确术语，比如 AOF、RDB、TTL 和 WATCH，这些词非常考验检索系统。第三，官方文档有稳定 URL，可以作为答案引用来源。这个选题能很好地展示 RAG 的核心价值：把答案约束到可追溯的文档上下文中。 这一页我会顺着画面把这些信息讲清楚：Redis 知识边界清晰；Redis 问答包含大量命令名和缩写；官方文档可追溯，适合做引用和忠实度评估；技术文档 RAG 的难点包括术语匹配、概念混淆和答案忠实度。讲的时候我会把它们串成“为什么这样设计、系统如何实现、结果说明什么”这条线索，整页讲完后自然过渡到下一页。
+这一页解释为什么选择 Redis 作为垂直领域。Redis 的知识边界很清楚，文档主题集中在数据结构、命令、持久化、高可用、集群和缓存工程这些内容上，适合构建一个范围明确的私有知识库。同时，Redis 问答中有大量精确术语，例如 AOF、RDB、TTL、WATCH、XREADGROUP，这些词如果没有被检索命中，答案很容易跑偏。第三，Redis 官方文档有稳定的 URL，可以把答案和来源绑定起来，所以这个选题能很好地展示 RAG 相比普通大模型问答的优势，也就是答案不只流畅，还要可追溯、可检查。这一页可以顺带强调，Redis 的难点不是概念有多大，而是术语非常密集。对于这种任务，检索质量会直接决定最终答案质量，所以选 Redis 能更明显地展示 RAG 系统为什么需要 Query Rewriting、BM25 和引用检查。
 
 ## 私有知识库构建流程
 
-这一页展示私有知识库构建流程。数据可以来自 Redis 官方文档，经过页面抓取和正文清洗后，保存为 JSONL。每条记录都包含 doc_id、title、url 和 text。doc_id 用于评估，url 用于追溯来源。为了保证作业能稳定运行，我保留了一份内置清洗语料，同时也提供脚本重新抓取官方文档。 这一页我会顺着画面把这些信息讲清楚：流程：官方文档、页面抓取、正文清洗、JSONL 语料、索引构建、问答系统；每条文档包含 doc_id、title、url、text；知识主题覆盖 Redis 数据结构、TTL、持久化、高可用、集群和缓存风险。讲的时候我会把它们串成“为什么这样设计、系统如何实现、结果说明什么”这条线索，整页讲完后自然过渡到下一页。
+这一页展示私有知识库的构建流程。数据来源可以是 Redis 官方文档，经过页面抓取、正文清洗以后保存为 JSONL 格式。每条文档都保留 doc_id、title、url 和 text，其中 doc_id 负责评估和引用，url 负责追溯来源，text 是清洗后的正文。为了保证老师本地可以稳定复现，我在仓库里放了一份内置清洗语料，同时保留了采集脚本。也就是说，这个项目既能离线跑通，又能说明真实私有知识库从网页到结构化语料的完整处理过程。讲到这里时，我会强调“私有知识库”不是把资料随便复制进来，而是要保留结构化字段和来源。后面检索、引用和评估都依赖这些字段，所以数据清洗阶段其实决定了整个系统后续能不能被检查和复现。
 
 ## 知识库主题覆盖
 
-这一页说明知识库覆盖面。Redis 不是只收集几个命令，而是覆盖了数据结构、生命周期、可靠性、高可用、编程能力和缓存工程。这样设计的好处是评估问题可以比较全面，比如既能问 AOF 和 RDB，也能问 Stream 和 Pub/Sub，或者问缓存击穿怎么缓解。覆盖原则是每个问题都应该能从知识库中找到依据，答案也要能回溯到文档来源，而不是让模型凭印象发挥。 这一页我会顺着画面把这些信息讲清楚：基础数据结构：String、Hash、List、Stream、Sorted Set；生命周期：EXPIRE、TTL、PERSIST；可靠性：RDB、AOF、appendfsync；高可用与扩展：Replication、Sentinel、Cluster；编程与消息：事务、Lua、Pub/Sub、Stream；缓存工程：缓存穿透、击穿和雪崩。讲的时候我会把它们串成“为什么这样设计、系统如何实现、结果说明什么”这条线索，整页讲完后自然过渡到下一页。
+这一页说明知识库覆盖范围。它不是只放几个 Redis 命令，而是覆盖了基础数据结构、生命周期管理、可靠性、高可用、横向扩展、脚本能力、消息机制和缓存工程。比如基础结构里有 String、Hash、List、Stream 和 Sorted Set，可靠性里有 RDB 和 AOF，高可用里有 Replication 和 Sentinel，缓存工程里有缓存穿透、击穿和雪崩。这样设计的好处是评估问题可以更全面，既能问一个单点命令，也能问架构机制和工程实践。这一页可以作为知识库的范围说明。它既覆盖常见命令，也覆盖高可用、集群和缓存风险这些工程问题，因此评估问题不是只问一个命令解释，而是能覆盖真实用户在学习或使用 Redis 时会问到的典型场景。
 
 ## Chunking：让检索单元既可命中又可阅读
 
-这一页解释 Chunking。技术文档分块不能只按普通句子切，因为 Redis 命令名非常关键。我实现了 Redis-aware tokenizer，保留命令名、缩写和中文领域词。默认分块大小是 320，重叠是 40。这样长文档可以切成可检索片段，同时相邻片段之间不会完全断开。每个 chunk 都有来源元数据，所以最后答案可以回到原文档。 这一页我会顺着画面把这些信息讲清楚：Redis-aware tokenizer 保留命令名、缩写和中文领域词；默认 chunk_size=320，overlap=40；每个 chunk 保留来源元数据；AOF/RDB 问题需要保留持久化、persistence、RDB、AOF、snapshot 等关键 token。讲的时候我会把它们串成“为什么这样设计、系统如何实现、结果说明什么”这条线索，整页讲完后自然过渡到下一页。
+这一页讲 Chunking。技术文档不能随便按长度切，因为 Redis 的命令名和缩写往往就是问题的关键。我实现了 Redis-aware tokenizer，专门保留 AOF、RDB、TTL、EXPIRE、WATCH 这类命令和缩写，也识别持久化、主从复制、消费者组这些中文领域词。默认 chunk_size 是 320，overlap 是 40，这样每个片段既不会太短导致上下文不足，也不会太长带入太多噪声。每个 chunk 还保存来源标题、URL 和 token 范围，后面做引用和调试时就能知道答案来自哪里。这里要突出一个关键点：Chunking 不只是把文本切短，而是在控制检索粒度。如果 chunk 太小，答案上下文不完整；如果 chunk 太大，弱相关信息会污染生成。现在的参数是在可读性、召回和噪声之间做了一个平衡。
 
-## Embedding 与本地向量数据库
+## Embedding 与向量库
 
-这一页说明 embedding 和向量库的升级。为了保证老师本地一定能跑，默认仍使用 hashing embedding 和 JSONL 本地向量库；为了回应后续扩展要求，我已经加入 SentenceTransformerEmbeddingModel，可以使用 BGE 小模型，也加入 FAISS 和 Chroma 的可选适配器。这样项目不是只停留在 demo，而是保留了课程可复现路径和真实部署升级路径。 这一页我会顺着画面把这些信息讲清楚：默认使用 HashingEmbeddingModel，维度 256；可选使用 BGE/SentenceTransformer embedding；向量库支持本地 JSONL、FAISS adapter 和 Chroma adapter；默认不强制下载模型，保证作业能稳定复现。讲的时候我会把它们串成“为什么这样设计、系统如何实现、结果说明什么”这条线索，整页讲完后自然过渡到下一页。
+这一页介绍 Embedding 和向量库。为了保证课程作业可以在普通电脑上直接复现，默认方案使用 hashing embedding 和本地 JSONL 向量库，不需要下载模型，也不依赖 GPU。为了增加深度，我又加入了 BGE 和 SentenceTransformer 的可选接口，还提供 FAISS 和 Chroma 的向量库适配。这样做的取舍是：默认路径稳，老师一键运行不会卡在依赖下载；增强路径也存在，如果要做更接近真实生产系统的实验，可以直接切换到 BGE embedding、FAISS 或 Chroma。讲这一页时，我会把“可复现”和“可扩展”分开说。默认 hashing embedding 是为了保证任何机器都能跑；BGE、FAISS 和 Chroma 是为了说明系统不是玩具结构，后续换成更强模型和向量库时，接口已经准备好了。
 
-## 已完成的增强扩展
+## 增强扩展
 
-这一页专门回应之前写在后续工作的扩展项。现在 BGE embedding 已经不是一句展望，而是做成了 SentenceTransformerEmbeddingModel；FAISS 和 Chroma 也做成了可选 vector store adapter；reranker 除了默认轻量版本，还预留了 cross-encoder 入口；评估集从 10 条扩展到 20 条，并新增 compare_retrieval.py 做 pure vector、BM25、hybrid 和 hybrid rerank 的消融对比；最后，生成后会自动输出 citation_check，用来检查引用编号是否有效。 这一页我会顺着画面把这些信息讲清楚：BGE embedding 作为可选 SentenceTransformer 适配器；FAISS 和 Chroma 作为可选向量库 adapter；cross-encoder reranker 作为可选升级路径；评估集扩充到 20 条并加入检索消融；生成后输出 citation_check。讲的时候我会把它们串成“为什么这样设计、系统如何实现、结果说明什么”这条线索，整页讲完后自然过渡到下一页。
+这一页集中展示已经完成的增强扩展。这里不是简单写后续工作，而是已经在代码里实现了可运行或可选启用的路径。第一，新增 SentenceTransformerEmbeddingModel，可以通过参数切换到 BGE。第二，新增 FAISS 和 Chroma 的 vector store adapter。第三，reranker 除了轻量版，也保留 cross-encoder 和 BGE reranker 入口。第四，评估集从原来的 10 条扩展到 20 条，覆盖更多 Redis 主题。第五，新增 compare_retrieval.py，可以做 pure vector、BM25、hybrid、hybrid rerank 的消融对比。第六，生成后会输出 citation_check，检查答案引用是否有效。这一页最好讲得明确一点：这些扩展不是 PPT 上写的空话，而是已经在命令行参数和代码模块里提供了入口。这样老师如果追问“后续工作有没有做”，可以直接指出具体文件和参数，而不是停留在概念层。
 
 ## Query Rewriting：连接中文问题与英文术语
 
-这一页是高级 RAG 优化的第一部分：Query Rewriting。Redis 官方文档很多术语是英文，但用户可能用中文问，比如“持久化”“高可用”“过期”。如果不扩展，检索可能找不到相关英文术语。所以我维护了一个领域词表，把中文问题扩展成 Redis 常用英文概念。这个策略主要提升召回率。 这一页我会顺着画面把这些信息讲清楚：持久化扩展为 persistence、RDB、AOF、snapshot；高可用扩展为 replication、sentinel、failover、cluster；过期扩展为 expire、TTL、timeout；队列扩展为 list、stream、consumer group、XREADGROUP；Query Rewriting 主要提升召回率。讲的时候我会把它们串成“为什么这样设计、系统如何实现、结果说明什么”这条线索，整页讲完后自然过渡到下一页。
+这一页讲 Query Rewriting。Redis 官方文档里很多术语是英文，但用户提问经常是中文，比如持久化、高可用、过期、队列。如果直接拿中文问题去检索英文文档，很容易召回不稳定。因此系统维护了一个领域词扩展表，把持久化扩展成 persistence、RDB、AOF、snapshot，把高可用扩展成 replication、sentinel、failover，把队列扩展成 list、stream、consumer group。这个模块的作用不是生成答案，而是在检索前把问题改写成更容易命中文档的形式。这里可以举一个具体例子：用户说“持久化”，Redis 文档里可能写的是 persistence、snapshot 或 append only file。如果不做查询重写，中文问题和英文文档之间会断开；做了扩展后，检索器才更容易找到真正相关片段。
 
 ## Hybrid Retrieval：BM25 与向量检索互补
 
-这一页解释混合检索。向量检索能处理语义相似，但是对命令名未必足够敏感。BM25 对精确词非常有效，但不能很好处理同义表达。所以我把二者融合。公式里向量权重是 0.45，BM25 权重是 0.55，因为 Redis 问答中命令名非常关键。这个策略比单纯向量检索更适合 Redis 技术文档。 这一页我会顺着画面把这些信息讲清楚：融合公式：score = 0.45 × vector + 0.55 × BM25；向量检索擅长语义相似；BM25 擅长 AOF、RDB、TTL、WATCH 等精确术语；Redis 问答需要语义理解和精确术语命中结合。讲的时候我会把它们串成“为什么这样设计、系统如何实现、结果说明什么”这条线索，整页讲完后自然过渡到下一页。
+这一页解释 Hybrid Retrieval。单纯向量检索能处理语义相似，但对 AOF、RDB、TTL、WATCH 这种精确术语未必足够敏感；单纯 BM25 对关键词非常强，但遇到中英文表达差异和同义表达时又会受限。因此系统把向量分数和 BM25 分数做归一化融合，公式是 score 等于 0.45 乘向量分数加 0.55 乘 BM25 分数。这里 BM25 权重略高，是因为 Redis 问答是命令密集型任务，精确术语命中对答案正确性非常关键。这一页可以把消融实验先埋个伏笔：后面结果会看到 pure vector 在 Redis 任务里弱一些，原因就在于向量检索不一定能抓住命令名。Hybrid 的意义就是让语义匹配和精确匹配同时发挥作用。
 
 ## 端到端系统架构
 
-这一页展示端到端架构。左边是文档处理和索引构建，文档先变成 chunk，再进入 embedding 和 BM25。右边是在线问答流程，用户问题先经过 Query Rewriting，然后由 Hybrid Retriever 找到候选上下文，再经过轻量 reranker 根据术语覆盖率和标题覆盖率做二次排序。最后系统把高质量上下文传给 DeepSeek 或抽取式生成器，并输出带引用答案。这样设计的重点是可观测、可替换和可复现：检索分数能看到，embedding 和向量库能替换，没有 API key 时也能跑完整流程。 这一页我会顺着画面把这些信息讲清楚：文档 JSONL 经过 Chunking 后进入 Embedding 和 BM25；用户问题经过 Query Rewriting 后进入 Hybrid Retriever；Top-k 候选经过轻量 reranker 二次排序；最终上下文传入 DeepSeek 或抽取式生成器；输出带引用答案和可解释检索分数。讲的时候我会把它们串成“为什么这样设计、系统如何实现、结果说明什么”这条线索，整页讲完后自然过渡到下一页。
+这一页展示端到端系统架构。左侧是离线构建阶段，Redis 文档先清洗成 JSONL，再经过 Chunking，之后同时进入 embedding 向量库和 BM25 索引。右侧是在线问答阶段，用户问题先经过 Query Rewriting，然后进入 Hybrid Retriever，候选片段再经过 reranker 二次排序，最后把筛选后的上下文交给 DeepSeek 或抽取式生成器。生成答案之后还会做 citation checking，检查引用编号是否存在、是否和上下文有关。整条链路的重点是可解释、可替换、可复现。讲架构时我会按离线和在线两条线走。离线部分负责把文档变成可检索索引，在线部分负责把问题变成检索请求并生成答案。这样老师能更清楚地看到系统不是一个黑盒，而是每一步都有输入、输出和可替换模块。
 
 ## 生成模块：DeepSeek 优先，离线可回退
 
-这一页说明生成模块。项目支持 DeepSeek，只要设置 DEEPSEEK_API_KEY，默认模型就是 deepseek-v4-pro。同时我保留了抽取式回退，保证没有 API key 也能运行。为了降低幻觉，系统提示要求模型只能依据检索上下文回答，并带引用。如果上下文不足，就要说明无法确认。这里也强调，API key 不会写入仓库，只通过环境变量传入。 这一页我会顺着画面把这些信息讲清楚：设置 DEEPSEEK_API_KEY 后默认使用 deepseek-v4-pro；没有 API key 时使用抽取式生成器；提示词要求只能基于上下文回答，并带来源引用；API key 不写入仓库。讲的时候我会把它们串成“为什么这样设计、系统如何实现、结果说明什么”这条线索，整页讲完后自然过渡到下一页。
+这一页讲生成模块。项目支持 DeepSeek，只要通过环境变量配置 DEEPSEEK_API_KEY，默认模型就是 deepseek-v4-pro。提示词里要求模型只能依据检索上下文回答，并且必须带 [1] 这样的来源引用。如果没有 API key，系统会自动使用抽取式回退，从检索片段里抽取最相关的句子组成答案。这个回退模式虽然表达没有强 LLM 那么自然，但它保证了作业在离线环境下也能完整运行，并且所有答案都来自知识库上下文。这里要说明为什么保留抽取式回退：课程作业经常需要在没有网络或没有 API key 的环境下展示，回退模式能保证系统仍然完整运行。DeepSeek 负责更自然的表达，抽取式生成负责稳定复现和忠实于上下文。
 
 ## 量化评估：三个维度衡量 RAG 能力
 
-这一页介绍评估方案。Context Relevance 主要评价检索是否找到了相关文档，Faithfulness 评价答案是否被上下文支持，也就是是否有幻觉风险，Answer Relevance 评价答案是否覆盖问题的关键点；这次评估集已经从 10 条扩充到 20 条，覆盖 String、Hash、List、Stream、持久化、高可用、Cluster、Lua、缓存风险等主题，输出结果会保存成 JSON 和 CSV，方便报告引用。 这一页我会顺着画面把这些信息讲清楚：Context Relevance 衡量检索上下文是否相关；Faithfulness 衡量答案是否忠实于上下文；Answer Relevance 衡量答案是否回答问题；评估集包含 20 条 Redis 技术问题。讲的时候我会把它们串成“为什么这样设计、系统如何实现、结果说明什么”这条线索，整页讲完后自然过渡到下一页。
+这一页介绍评估方案。RAG 系统不能只展示一个看起来不错的答案，还要量化检索和生成的效果。所以我设置了三个指标：Context Relevance 看检索结果是否覆盖标注相关文档，Faithfulness 看答案内容是否能被上下文支持，Answer Relevance 看答案是否覆盖问题需要的关键词。评估集现在有 20 条 Redis 技术问题，覆盖数据结构、持久化、高可用、Cluster、Lua、缓存风险等主题，结果会保存为 JSON 和 CSV，方便复查和写报告。我会强调这三个指标分别对应 RAG 的三个问题：有没有找对资料，回答有没有依据，回答有没有切题。只看一个最终答案很主观，而这三个指标能把系统能力拆开看，便于定位问题到底出在检索还是生成。
 
 ## 实验结果与解释
 
-这一页展示实验结果。图里的数值不是手工写的，而是实际运行 evaluate.py --rebuild 后从 outputs/eval_results.json 中读取并生成的；20 条评估问题下，Context Relevance 是 0.9750，说明检索整体覆盖稳定但多文档问题仍有少量漏召回，Faithfulness 是 0.8319，说明答案大多数内容能被上下文支持，Answer Relevance 是 0.9375，说明答案基本覆盖问题要点；这个结果比只跑 10 条问题更有说服力。 这一页我会顺着画面把这些信息讲清楚：Context Relevance = 0.9750；Faithfulness = 0.8319；Answer Relevance = 0.9375；检索效果较稳，答案忠实度较好，部分关键词覆盖仍可提升。讲的时候我会把它们串成“为什么这样设计、系统如何实现、结果说明什么”这条线索，整页讲完后自然过渡到下一页。
+这一页展示实际评估结果。图里的数值来自真实运行 evaluate.py --rebuild，不是手工编造。20 条问题下，Context Relevance 是 0.9750，说明检索整体比较稳定，但对于个别多主题问题仍然可能漏掉一部分 gold 文档；Faithfulness 是 0.8319，说明答案大部分内容能被检索上下文支持；Answer Relevance 是 0.9375，说明答案基本覆盖关键要点。这组结果说明系统已经能完成课程要求，同时也保留了可以继续优化的空间。这一页讲结果时不要只念分数，还要解释分数背后的含义。Context Relevance 高说明知识库和检索策略整体有效，Faithfulness 不是满分说明自动生成仍可能带来表达上的扩展，Answer Relevance 高说明答案基本覆盖用户问题中的关键点。
 
 ## 检索策略消融：Vector、BM25、Hybrid 对比
 
-这一页是新增的检索消融实验。compare_retrieval.py 会在同一批 20 条问题上对比 pure vector、BM25、hybrid 和 hybrid rerank，可以看到 pure vector 的 Context Relevance、Top-1 Hit 和 MRR 都明显低一些，说明只靠语义向量不够适合 Redis 这种命令名密集的技术文档；BM25 和 hybrid 表现更稳，hybrid rerank 的主要价值是保留最终排序和术语覆盖等可解释字段，方便做 bad case 分析。 这一页我会顺着画面把这些信息讲清楚：pure vector 的 Context Relevance、Top-1 Hit 和 MRR 都低于 BM25 和 hybrid；BM25 在 Redis 这种命令密集型知识库里非常强；hybrid 和 hybrid_rerank 保持 Top-1 与 MRR 稳定，同时提供更完整的可解释字段。讲的时候我会把它们串成“为什么这样设计、系统如何实现、结果说明什么”这条线索，整页讲完后自然过渡到下一页。
+这一页是检索策略消融实验。compare_retrieval.py 在同一批 20 条问题上对比 pure vector、BM25、hybrid 和 hybrid rerank。结果可以看到，pure vector 的 Context Relevance、Top-1 Hit 和 MRR 都低于其他策略，说明只靠向量检索不适合 Redis 这种命令名密集的技术文档。BM25 在当前评估集上表现非常强，hybrid 和 hybrid rerank 保持了 Top-1 与 MRR 的稳定。rerank 的价值主要在于提供最终排序和术语覆盖等可解释字段，方便后续做 Bad Case 分析。这一页是整套作业比较有深度的地方。它说明我没有只给出一个最终系统，而是比较了不同检索策略。BM25 在当前 Redis 任务里很强，这也反过来证明技术文档问答不能盲目迷信纯向量检索。
 
 ## 案例分析：AOF 与 RDB 持久化问答
 
-这一页用 AOF 和 RDB 问题做案例。这里放的是脚本真实运行输出，不是后期编造的截图。系统最终命中了 redis:persistence 文档，最终 score 是 1.0819，其中 hybrid combined_score 是 1.0000，reranker 又根据 AOF、RDB、persistence 等术语覆盖给了额外奖励。答案解释了 RDB 是快照，适合备份和快速恢复；AOF 是追加日志，通常数据安全性更好。这个案例能说明 Query Rewriting、BM25 精确术语匹配和轻量重排序的价值：中文问题会扩展到 persistence、snapshot 和 append only file，同时 AOF 和 RDB 被精确命中。 这一页我会顺着画面把这些信息讲清楚：问题是 Redis 的 AOF 和 RDB 持久化有什么区别；系统命中文档 redis:persistence；最终 score = 1.0819，说明 rerank 在 hybrid score 基础上加入术语覆盖奖励；答案包含 RDB 快照、AOF 追加日志、备份恢复和数据安全性；命中原因是 Query Rewriting、BM25 精确术语匹配和轻量重排序共同作用。讲的时候我会把它们串成“为什么这样设计、系统如何实现、结果说明什么”这条线索，整页讲完后自然过渡到下一页。
+这一页用 AOF 和 RDB 的问题做案例分析。这里放的是 infer.py 真实运行输出，系统最终命中了 redis:persistence 文档，最终 score 是 1.0819，其中 combined_score 是 1.0000，reranker 又根据 AOF、RDB、persistence 这些术语覆盖给了额外加分。答案说明 RDB 是快照，适合备份和快速恢复；AOF 是追加日志，通常提供更好的数据安全性。这个案例能说明 Query Rewriting、BM25 精确匹配和轻量重排序是如何共同把问题定位到正确文档上的。案例页可以讲得更细一点：AOF 和 RDB 这种问题同时包含中文概念和英文缩写，正好考验 Query Rewriting、BM25 和 rerank。最后 persistence 文档排第一，说明系统不仅答对了，而且能解释为什么选择这个来源。
 
-## Bad Case、改进方向与总结
+## 检索分数、Bad Case 与总结
 
-最后一页总结问题和改进。表格来自 infer.py --json 的真实输出，可以看到 redis:persistence 排名第一，score 和 rerank_score 都是 1.0819，term_coverage 明显高于其他候选；一个典型 bad case 是 AOF/RDB 问题仍会召回 Pub/Sub，因为 Pub/Sub 文档也出现了“不会持久化”这类词；为了解决这个问题，我加入了 Query Rewriting、BM25/Vector 混合检索、轻量重排序和生成阶段上下文过滤，并且已经完成 BGE embedding、FAISS/Chroma adapter、20 条评估集、检索消融对比和 citation checking 等扩展，整体项目已经形成从知识库、检索、生成、评估到展示材料的完整闭环。 这一页我会顺着画面把这些信息讲清楚：真实 JSON 输出展示 score、combined_score、rerank_score 和 term_coverage；Bad Case：AOF/RDB 问题仍会召回 Pub/Sub 弱相关文档；已做改进：Query Rewriting、混合检索、轻量重排序和上下文过滤；已完成扩展：BGE/FAISS 可选适配、20 条评估集、检索消融和 citation checking。讲的时候我会把它们串成“为什么这样设计、系统如何实现、结果说明什么”这条线索，整页讲完后自然过渡到下一页。
+最后一页做总结和反思。表格来自 infer.py --json 的真实输出，可以看到 redis:persistence 排名第一，而 redis:pubsub 虽然也被召回，但分数明显低一些。这个 Bad Case 很典型，因为 Pub/Sub 文档里也出现了“不会持久化”这类词，容易形成弱相关召回。系统通过 Query Rewriting、Hybrid Retrieval、Rerank 和上下文过滤把真正相关文档排在前面，并且用 citation checking 检查答案引用。总体来说，这个项目已经形成从知识库构建、检索、生成、评估到展示材料的完整闭环。最后收束时，我会把贡献总结成四句话：有私有知识库，有高级检索策略，有真实量化评估，有 Bad Case 和改进分析。这样结束会比较完整，也能回应作业要求中的系统构建、优化、评估和深度分析。

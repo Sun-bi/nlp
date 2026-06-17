@@ -21,7 +21,8 @@ OUT.mkdir(parents=True, exist_ok=True)
 RUN_LOGS = ROOT / "outputs" / "run_logs"
 RUN_LOGS.mkdir(parents=True, exist_ok=True)
 
-WIDE = (1600, 900)
+SCALE = 2
+WIDE = (1600 * SCALE, 900 * SCALE)
 RED = "#D92D20"
 RED_DARK = "#8A1C14"
 INK = "#17212B"
@@ -36,6 +37,55 @@ AMBER = "#F59E0B"
 GREEN = "#16A34A"
 
 
+def _scale(value: int | float) -> int:
+    return int(round(value * SCALE))
+
+
+def _scale_xy(values):
+    return tuple(_scale(value) for value in values)
+
+
+class ScaledDraw:
+    """Draw with 1600x900 logical coordinates on a high-resolution canvas."""
+
+    def __init__(self, draw: ImageDraw.ImageDraw) -> None:
+        self._draw = draw
+
+    def rectangle(self, xy, **kwargs):
+        if "width" in kwargs:
+            kwargs["width"] = max(1, _scale(kwargs["width"]))
+        return self._draw.rectangle(_scale_xy(xy), **kwargs)
+
+    def rounded_rectangle(self, xy, radius=0, **kwargs):
+        if "width" in kwargs:
+            kwargs["width"] = max(1, _scale(kwargs["width"]))
+        return self._draw.rounded_rectangle(_scale_xy(xy), radius=_scale(radius), **kwargs)
+
+    def text(self, xy, text, **kwargs):
+        return self._draw.text(_scale_xy(xy), text, **kwargs)
+
+    def multiline_text(self, xy, text, **kwargs):
+        if "spacing" in kwargs:
+            kwargs["spacing"] = _scale(kwargs["spacing"])
+        return self._draw.multiline_text(_scale_xy(xy), text, **kwargs)
+
+    def line(self, xy, **kwargs):
+        if "width" in kwargs:
+            kwargs["width"] = max(1, _scale(kwargs["width"]))
+        return self._draw.line(_scale_xy(xy), **kwargs)
+
+    def polygon(self, xy, **kwargs):
+        points = [_scale_xy(point) for point in xy] if xy and isinstance(xy[0], tuple) else _scale_xy(xy)
+        return self._draw.polygon(points, **kwargs)
+
+    def ellipse(self, xy, **kwargs):
+        return self._draw.ellipse(_scale_xy(xy), **kwargs)
+
+
+def drawing(img: Image.Image) -> ScaledDraw:
+    return ScaledDraw(ImageDraw.Draw(img))
+
+
 def font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
     candidates = [
         "/System/Library/Fonts/PingFang.ttc",
@@ -45,7 +95,7 @@ def font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
     ]
     for candidate in candidates:
         if Path(candidate).exists():
-            return ImageFont.truetype(candidate, size=size, index=0)
+            return ImageFont.truetype(candidate, size=size * SCALE, index=0)
     return ImageFont.load_default()
 
 
@@ -141,7 +191,7 @@ def shadow_card(draw, xy, radius=26, fill=PANEL, outline=LINE):
 
 def create_hero():
     img = Image.new("RGB", WIDE, INK)
-    draw = ImageDraw.Draw(img)
+    draw = drawing(img)
     draw.rectangle((0, 0, 1600, 900), fill=INK)
     draw.rectangle((0, 0, 520, 900), fill=RED_DARK)
     draw.polygon([(520, 0), (720, 0), (560, 900), (420, 900)], fill="#B3261E")
@@ -171,7 +221,7 @@ def create_hero():
 
 def create_kb_overview():
     img = Image.new("RGB", WIDE, BG)
-    draw = ImageDraw.Draw(img)
+    draw = drawing(img)
     draw.text((70, 60), "Redis 私有知识库覆盖范围", font=F_TITLE, fill=INK)
     draw.text((72, 128), "16 个主题 · 官方文档 URL 可追溯 · JSONL 结构化存储", font=F_BODY, fill=MUTED)
     topics = [
@@ -203,7 +253,7 @@ def create_kb_overview():
 
 def create_architecture_photo():
     img = Image.new("RGB", WIDE, BG)
-    draw = ImageDraw.Draw(img)
+    draw = drawing(img)
     draw.text((70, 60), "RAG 数据流：从文档到带引用答案", font=F_TITLE, fill=INK)
     nodes = [
         ("Redis\nDocs", 80, 250, RED),
@@ -244,7 +294,7 @@ def create_architecture_photo():
 
 def create_inference_result(infer_text: str):
     img = Image.new("RGB", WIDE, BG)
-    draw = ImageDraw.Draw(img)
+    draw = drawing(img)
     draw.text((70, 55), "真实一键推理运行结果", font=F_TITLE, fill=INK)
     draw.text((72, 125), "由脚本实际执行 infer.py 后生成，原始 stdout 保存到 outputs/run_logs/infer_stdout.txt", font=F_SMALL, fill=MUTED)
     draw_terminal_panel(draw, infer_text, (80, 180, 1515, 805), "VS Code Terminal · infer.py actual stdout")
@@ -254,7 +304,7 @@ def create_inference_result(infer_text: str):
 def create_evaluation_chart(eval_text: str):
     summary = json.loads((ROOT / "outputs/eval_results.json").read_text(encoding="utf-8")).get("summary", {})
     img = Image.new("RGB", WIDE, BG)
-    draw = ImageDraw.Draw(img)
+    draw = drawing(img)
     draw.text((70, 55), "三维量化评估结果与真实运行输出", font=F_TITLE, fill=INK)
     draw.text((72, 125), "evaluate.py 实际运行后写入 outputs/eval_results.json / csv", font=F_BODY, fill=MUTED)
     metrics = [
@@ -275,7 +325,7 @@ def create_evaluation_chart(eval_text: str):
 
 def create_build_result(build_text: str):
     img = Image.new("RGB", WIDE, BG)
-    draw = ImageDraw.Draw(img)
+    draw = drawing(img)
     draw.text((70, 55), "真实索引构建运行结果", font=F_TITLE, fill=INK)
     draw.text((72, 125), "build_index.py 实际运行后生成 chunks.jsonl 与 vectors.jsonl", font=F_BODY, fill=MUTED)
     draw_terminal_panel(draw, build_text, (80, 185, 1515, 790), "VS Code Terminal · build_index.py actual stdout")
@@ -284,7 +334,7 @@ def create_build_result(build_text: str):
 
 def create_retrieval_scores(payload: dict):
     img = Image.new("RGB", WIDE, BG)
-    draw = ImageDraw.Draw(img)
+    draw = drawing(img)
     draw.text((70, 55), "检索命中文档与二阶段重排序分数", font=F_TITLE, fill=INK)
     draw.text((72, 125), "数据来自 infer.py --json 的真实输出：score = rerank_score，保留 hybrid/vector/BM25/coverage 便于调试", font=F_SMALL, fill=MUTED)
     headers = ["Rank", "doc_id", "score", "hybrid", "rerank", "coverage"]
@@ -320,7 +370,7 @@ def create_retrieval_comparison():
     data = json.loads((ROOT / "outputs/retrieval_comparison.json").read_text(encoding="utf-8"))
     rows = data["summary"]
     img = Image.new("RGB", WIDE, BG)
-    draw = ImageDraw.Draw(img)
+    draw = drawing(img)
     draw.text((70, 55), "检索策略消融对比", font=F_TITLE, fill=INK)
     draw.text((72, 125), "compare_retrieval.py 真实运行输出：20 条问题，Top-k=5", font=F_BODY, fill=MUTED)
     metrics = [
