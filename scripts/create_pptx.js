@@ -16,7 +16,7 @@ pptx.theme = {
   lang: "zh-CN",
 };
 
-const OUT_PPTX = "slides/redis_rag_presentation.pptx";
+const OUT_PPTX = "slides/rag.pptx";
 const OUT_SCRIPT = "slides/redis_rag_speaker_script.md";
 const ASSET_DIR = "slides/assets";
 const TOTAL = 17;

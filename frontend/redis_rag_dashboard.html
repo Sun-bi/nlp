@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Redis-RAG 可视化展示</title>
+  <style>
+    :root {
+      --redis: #d92d20;
+      --redis-dark: #8a1c14;
+      --ink: #17212b;
+      --text: #24313d;
+      --muted: #64748b;
+      --line: #d7dee8;
+      --bg: #f6f8fb;
+      --panel: #ffffff;
+      --teal: #0f766e;
+      --blue: #2563eb;
+      --amber: #f59e0b;
+      --green: #16a34a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, "Microsoft YaHei", sans-serif;
+    }
+
+    .app {
+      width: 100vw;
+      height: 100vh;
+      display: grid;
+      grid-template-columns: 230px 1fr;
+      background: var(--bg);
+      overflow: hidden;
+    }
+
+    .sidebar {
+      background: var(--ink);
+      color: #fff;
+      padding: 28px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      background: var(--redis);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.1;
+    }
+
+    .brand p {
+      margin: 4px 0 0;
+      color: #cbd5e1;
+      font-size: 12px;
+    }
+
+    .nav {
+      display: grid;
+      gap: 10px;
+    }
+
+    .nav span {
+      padding: 10px 12px;
+      border-left: 3px solid transparent;
+      color: #cbd5e1;
+      font-size: 14px;
+    }
+
+    .nav span.active {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--redis);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .side-stat {
+      margin-top: auto;
+      display: grid;
+      gap: 12px;
+    }
+
+    .side-stat div {
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .side-stat strong {
+      display: block;
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+
+    .side-stat small {
+      color: #cbd5e1;
+      font-size: 12px;
+    }
+
+    .main {
+      padding: 26px 32px 30px;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 20px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .title h2 {
+      margin: 0;
+      color: var(--ink);
+      font-size: 28px;
+      line-height: 1.15;
+    }
+
+    .title p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .status {
+      display: flex;
+      gap: 10px;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .pill.ok {
+      color: var(--green);
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 18px;
+      min-height: 0;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 14px 34px rgba(23, 33, 43, 0.08);
+    }
+
+    .qa {
+      padding: 22px;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 18px;
+      min-height: 0;
+    }
+
+    .query {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      padding: 13px 14px;
+      background: #fbfcfe;
+      font-size: 17px;
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .query button {
+      border: 0;
+      background: var(--redis);
+      color: #fff;
+      border-radius: 6px;
+      padding: 10px 16px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .answer {
+      border-left: 5px solid var(--redis);
+      background: #fff7f6;
+      padding: 16px 18px;
+    }
+
+    .answer h3,
+    .evidence h3,
+    .pipeline h3 {
+      margin: 0 0 10px;
+      color: var(--ink);
+      font-size: 18px;
+    }
+
+    .answer p {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.72;
+    }
+
+    .cite {
+      color: var(--redis);
+      font-weight: 800;
+    }
+
+    .pipeline {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      min-height: 0;
+    }
+
+    .pipeline-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .step {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      min-height: 112px;
+      background: #fff;
+    }
+
+    .step b {
+      display: block;
+      color: var(--ink);
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+
+    .step span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .right {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 18px;
+      min-height: 0;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .metric {
+      padding: 16px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 27px;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .evidence {
+      padding: 20px;
+      min-height: 0;
+    }
+
+    .result-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .result {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .result-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .result-title {
+      font-weight: 800;
+      color: var(--ink);
+      font-size: 15px;
+    }
+
+    .score {
+      color: #fff;
+      background: var(--teal);
+      border-radius: 5px;
+      padding: 5px 8px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .bars {
+      display: grid;
+      gap: 8px;
+    }
+
+    .bar {
+      display: grid;
+      grid-template-columns: 78px 1fr 42px;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .track {
+      height: 8px;
+      background: #e5eaf0;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .fill {
+      height: 100%;
+      background: var(--redis);
+    }
+
+    .fill.blue {
+      background: var(--blue);
+    }
+
+    .fill.amber {
+      background: var(--amber);
+    }
+
+    .source {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">R</div>
+        <div>
+          <h1>Redis-RAG</h1>
+          <p>垂直领域问答系统</p>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <span class="active">问答演示</span>
+        <span>知识库索引</span>
+        <span>混合检索</span>
+        <span>引用检查</span>
+      </nav>
+
+      <section class="side-stat">
+        <div>
+          <strong>14</strong>
+          <small>Redis 官方文档页面</small>
+        </div>
+        <div>
+          <strong>196</strong>
+          <small>索引后的检索 chunk</small>
+        </div>
+      </section>
+    </aside>
+
+    <section class="main">
+      <header class="topbar">
+        <div class="title">
+          <h2>前端可视化展示：从问题到带引用答案</h2>
+          <p>展示 Query Rewriting、BM25/Vector 混合检索、Reranking、Citation Checking 的最终运行效果</p>
+        </div>
+        <div class="status">
+          <span class="pill">Index: data/index_official</span>
+          <span class="pill ok">citation passed</span>
+        </div>
+      </header>
+
+      <section class="content">
+        <div class="panel qa">
+          <div class="query">
+            <span>Redis 的 AOF 和 RDB 持久化有什么区别？</span>
+            <button>运行问答</button>
+          </div>
+
+          <article class="answer">
+            <h3>生成答案</h3>
+            <p>
+              RDB 是某一时刻的数据快照，文件紧凑，适合备份和快速恢复；AOF 以追加日志记录写命令，通常能提供更好的数据安全性，可以按
+              <b>always / everysec / no</b> 配置刷盘策略。生产中可以同时开启 RDB 和 AOF，在恢复速度和数据安全之间取得平衡
+              <span class="cite">[1]</span>。
+            </p>
+          </article>
+
+          <section class="pipeline">
+            <h3>最终 RAG 流程</h3>
+            <div class="pipeline-grid">
+              <div class="step">
+                <b>1. Query Rewriting</b>
+                <span>“持久化”扩展为 persistence、RDB、AOF、snapshot、append only file。</span>
+              </div>
+              <div class="step">
+                <b>2. Hybrid Retrieval</b>
+                <span>向量相似度负责语义匹配，BM25 强化 AOF、RDB 等精确术语。</span>
+              </div>
+              <div class="step">
+                <b>3. Reranking</b>
+                <span>根据术语覆盖和标题覆盖二次排序，让 redis:persistence 排到最前。</span>
+              </div>
+              <div class="step">
+                <b>4. Grounded Answer</b>
+                <span>只基于 Top-k 片段生成，答案必须带来源引用。</span>
+              </div>
+              <div class="step">
+                <b>5. Citation Check</b>
+                <span>检查 [1] 是否存在，并验证答案与引用上下文有词项重叠。</span>
+              </div>
+              <div class="step">
+                <b>6. 可解释输出</b>
+                <span>同时展示 score、vector_score、bm25_score、rerank_score 和来源 URL。</span>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <aside class="right">
+          <div class="metrics">
+            <div class="panel metric">
+              <strong>0.9750</strong>
+              <span>Context Relevance</span>
+            </div>
+            <div class="panel metric">
+              <strong>0.8319</strong>
+              <span>Faithfulness</span>
+            </div>
+            <div class="panel metric">
+              <strong>0.9375</strong>
+              <span>Answer Relevance</span>
+            </div>
+          </div>
+
+          <section class="panel evidence">
+            <h3>检索证据 Top-3</h3>
+            <div class="result-list">
+              <article class="result">
+                <div class="result-head">
+                  <span class="result-title">Redis persistence</span>
+                  <span class="score">1.0763</span>
+                </div>
+                <div class="bars">
+                  <div class="bar"><span>BM25</span><div class="track"><div class="fill" style="width:96%"></div></div><b>0.96</b></div>
+                  <div class="bar"><span>Vector</span><div class="track"><div class="fill blue" style="width:82%"></div></div><b>0.82</b></div>
+                  <div class="bar"><span>Rerank</span><div class="track"><div class="fill amber" style="width:100%"></div></div><b>1.00</b></div>
+                </div>
+                <p class="source">来源：https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/</p>
+              </article>
+
+              <article class="result">
+                <div class="result-head">
+                  <span class="result-title">Redis persistence · AOF rewrite</span>
+                  <span class="score">1.0669</span>
+                </div>
+                <div class="bars">
+                  <div class="bar"><span>BM25</span><div class="track"><div class="fill" style="width:91%"></div></div><b>0.91</b></div>
+                  <div class="bar"><span>Vector</span><div class="track"><div class="fill blue" style="width:79%"></div></div><b>0.79</b></div>
+                  <div class="bar"><span>Rerank</span><div class="track"><div class="fill amber" style="width:97%"></div></div><b>0.97</b></div>
+                </div>
+                <p class="source">命中原因：AOF、RDB、persistence、append only file 等关键 token 覆盖高。</p>
+              </article>
+
+              <article class="result">
+                <div class="result-head">
+                  <span class="result-title">Redis persistence · interactions</span>
+                  <span class="score">1.0189</span>
+                </div>
+                <div class="bars">
+                  <div class="bar"><span>BM25</span><div class="track"><div class="fill" style="width:86%"></div></div><b>0.86</b></div>
+                  <div class="bar"><span>Vector</span><div class="track"><div class="fill blue" style="width:76%"></div></div><b>0.76</b></div>
+                  <div class="bar"><span>Rerank</span><div class="track"><div class="fill amber" style="width:92%"></div></div><b>0.92</b></div>
+                </div>
+                <p class="source">用于补充说明同时开启 AOF/RDB 时的恢复优先级与交互关系。</p>
+              </article>
+            </div>
+          </section>
+        </aside>
+      </section>
+    </section>
+  </main>
+</body>
+</html>
