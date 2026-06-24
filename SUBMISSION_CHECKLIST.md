@@ -28,8 +28,6 @@ python3 -m pip install -r requirements.txt
 PYTHONPATH=src python3 -m pytest tests -q
 ```
 
-## 提交前不要放进去
-
 - `.DS_Store`
 - `.pytest_cache/`
 - `__pycache__/`
