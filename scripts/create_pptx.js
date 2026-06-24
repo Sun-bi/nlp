@@ -5,10 +5,10 @@ const pptxgen = require("pptxgenjs");
 const pptx = new pptxgen();
 pptx.defineLayout({ name: "WIDE", width: 13.333, height: 7.5 });
 pptx.layout = "WIDE";
-pptx.author = "Redis RAG Coursework";
+pptx.author = "Redis RAG";
 pptx.subject = "基于 RAG 的 Redis 垂直领域深度问答系统构建";
 pptx.title = "Redis-RAG 垂直领域深度问答系统";
-pptx.company = "Coursework";
+pptx.company = "Redis RAG";
 pptx.lang = "zh-CN";
 pptx.theme = {
   headFontFace: "Microsoft YaHei",
@@ -217,7 +217,7 @@ function addTableLike(slide, rows, x, y, w, h, headerFill = C.paleRed) {
   slide.addText("Redis-RAG", { x: 0.9, y: 1.18, w: 6.4, h: 0.62, ...font(42, "FFFFFF", true) });
   slide.addText("基于 RAG 的垂直领域深度问答系统构建", { x: 0.92, y: 2.08, w: 7.3, h: 0.42, ...font(22, "F8FAFC", false), fit: "shrink" });
   slide.addText("私有知识库 · 混合检索 · DeepSeek 生成 · 三维量化评估", { x: 0.95, y: 3.05, w: 7.1, h: 0.34, ...font(17, "DDE7F3", true), fit: "shrink" });
-  slide.addText("课程作业完整交付：代码仓库 / README / requirements / infer.py / 报告 / PPT / 逐页讲稿", { x: 0.95, y: 3.68, w: 7.9, h: 0.36, ...font(14.5, "CBD5E1", false), fit: "shrink" });
+  slide.addText("完整交付：代码仓库 / README / requirements / infer.py / 报告 / PPT / 逐页讲稿", { x: 0.95, y: 3.68, w: 7.9, h: 0.36, ...font(14.5, "CBD5E1", false), fit: "shrink" });
   slide.addShape(pptx.ShapeType.roundRect, { x: 9.85, y: 1.55, w: 2.35, h: 2.35, rectRadius: 0.08, fill: { color: C.redis }, line: { color: C.redis } });
   slide.addText("RAG", { x: 10.15, y: 2.1, w: 1.72, h: 0.42, ...font(31, "FFFFFF", true), align: "center" });
   slide.addText("Redis Docs\nQA System", { x: 10.18, y: 2.82, w: 1.66, h: 0.52, ...font(13, "FFFFFF", true), align: "center", fit: "shrink" });
@@ -227,13 +227,13 @@ function addTableLike(slide, rows, x, y, w, h, headerFill = C.paleRed) {
     "Redis-RAG：基于 RAG 的 Redis 垂直领域深度问答系统",
     "关键词：私有知识库、混合检索、DeepSeek 生成、三维量化评估",
     "交付物：代码仓库、README、依赖文件、一键推理、报告、PPT、讲稿",
-  ], "这一页是汇报封面。我的作业选题是 Redis 垂直领域问答系统。核心思路是把 Redis 官方文档和清洗后的技术语料构造成私有知识库，然后通过 RAG 的方式进行检索增强生成。系统不仅包含一键推理脚本，也包含索引构建、量化评估、报告和 PPT。后面我会按照数据、检索、生成、评估和案例分析的顺序展开。");
+  ], "这一页是汇报封面。项目主题是 Redis 垂直领域问答系统。核心思路是把 Redis 官方文档和清洗后的技术语料构造成私有知识库，然后通过 RAG 的方式进行检索增强生成。系统不仅包含一键推理脚本，也包含索引构建、量化评估、报告和 PPT。后面我会按照数据、检索、生成、评估和案例分析的顺序展开。");
 }
 
 // Slide 2
 {
   const slide = pptx.addSlide();
-  addHeader(slide, "作业要求与本项目交付", "01 任务映射", 2);
+  addHeader(slide, "任务要求与本项目交付", "01 任务映射", 2);
   addCallout(slide, "目标：不是只演示概念，而是交付可运行、可解释、可评估的 RAG 仓库", 0.75, 1.25, 11.85, 0.62, C.redis);
   addCard(slide, 0.75, 2.25, 3.65, 2.05, "代码仓库", "README.md\nrequirements.txt\ninfer.py 一键推理\nbuild_index.py / evaluate.py", C.redis, 14.5);
   addCard(slide, 4.85, 2.25, 3.65, 2.05, "RAG 核心", "Query Rewriting\nHybrid Retrieval\nReranking\nCitation Checking", C.teal, 14.5);
@@ -243,11 +243,11 @@ function addTableLike(slide, rows, x, y, w, h, headerFill = C.paleRed) {
     "无 API key 时可复现；配置 DeepSeek 后可调用 deepseek-v4-pro",
     "评估输出保存为 JSON/CSV，PPT 结果图来自真实命令输出"
   ], 1.05, 5.05, 11.1, 0.95, 15.5);
-  addNotes(slide, 2, "作业要求与本项目交付", [
+  addNotes(slide, 2, "任务要求与本项目交付", [
     "本项目交付完整代码仓库",
     "核心 RAG 模块包括知识库、Chunking、Embedding、向量库、混合检索、重排序、引用检查和生成",
     "展示材料包括报告 Word、PPT、演讲者备注和讲稿",
-  ], "这一页说明作业要求和项目交付之间的对应关系。代码仓库里有 README、requirements 和 infer.py，满足一键运行要求；RAG 核心部分包括 Redis 私有知识库、文档分块、embedding、本地向量库、Query Rewriting、BM25/Vector 混合检索、轻量重排序和引用检查；另外我补充了 BGE embedding、FAISS 和 Chroma 的可选适配，加入 20 条评估问题和检索策略消融对比，展示材料也包括可编辑 Word 报告、PPT、演讲者备注和单独讲稿。");
+  ], "这一页说明任务要求和项目交付之间的对应关系。代码仓库里有 README、requirements 和 infer.py，满足一键运行要求；RAG 核心部分包括 Redis 私有知识库、文档分块、embedding、本地向量库、Query Rewriting、BM25/Vector 混合检索、轻量重排序和引用检查；另外补充了 BGE embedding、FAISS 和 Chroma 的可选适配，加入 20 条评估问题和检索策略消融对比，展示材料也包括可编辑 Word 报告、PPT、演讲者备注和单独讲稿。");
 }
 
 // Slide 3
@@ -293,7 +293,7 @@ function addTableLike(slide, rows, x, y, w, h, headerFill = C.paleRed) {
     "流程：官方文档、页面抓取、正文清洗、JSONL 语料、索引构建、问答系统",
     "每条文档包含 doc_id、title、url、text",
     "知识主题覆盖 Redis 数据结构、TTL、持久化、高可用、集群和缓存风险",
-  ], "这一页展示私有知识库构建流程。数据可以来自 Redis 官方文档，经过页面抓取和正文清洗后，保存为 JSONL。每条记录都包含 doc_id、title、url 和 text。doc_id 用于评估，url 用于追溯来源。为了保证作业能稳定运行，我保留了一份内置清洗语料，同时也提供脚本重新抓取官方文档。");
+  ], "这一页展示私有知识库构建流程。数据可以来自 Redis 官方文档，经过页面抓取和正文清洗后，保存为 JSONL。每条记录都包含 doc_id、title、url 和 text。doc_id 用于评估，url 用于追溯来源。为了保证系统能稳定运行，仓库保留了一份内置清洗语料，同时也提供脚本重新抓取官方文档。");
 }
 
 // Slide 5
@@ -338,18 +338,18 @@ function addTableLike(slide, rows, x, y, w, h, headerFill = C.paleRed) {
 {
   const slide = pptx.addSlide();
   addHeader(slide, "Embedding 与向量库：默认可复现，可选增强", "05 向量索引", 7);
-  addCard(slide, 0.85, 1.35, 3.85, 2.25, "默认方案", "HashingEmbeddingModel\n维度：256\n无需下载模型、无需 GPU、结果稳定，适合老师直接复现。", C.redis, 14.4);
+  addCard(slide, 0.85, 1.35, 3.85, 2.25, "默认方案", "HashingEmbeddingModel\n维度：256\n无需下载模型、无需 GPU、结果稳定，适合本地直接复现。", C.redis, 14.4);
   addCard(slide, 4.95, 1.35, 3.85, 2.25, "可选 BGE", "SentenceTransformerEmbeddingModel\n支持 BAAI/bge-small-zh-v1.5\n适合有模型缓存或网络环境时启用。", C.teal, 14.4);
   addCard(slide, 9.05, 1.35, 3.15, 2.25, "向量库", "Local JSONL\nFAISS adapter\nChroma adapter\n默认不强依赖外部服务。", C.amber, 14.4);
   slide.addShape(pptx.ShapeType.roundRect, { x: 1.0, y: 4.35, w: 11.3, h: 1.35, rectRadius: 0.04, fill: { color: "FFFFFF" }, line: { color: C.line } });
   slide.addText('"chunk": { "doc_id": "redis:persistence", "title": "...", "text": "..." }\n"vector": [0.0, 0.12, -0.04, ...]', { x: 1.3, y: 4.72, w: 10.7, h: 0.55, ...font(13, C.ink, false), fontFace: "Courier New", fit: "shrink" });
-  slide.addText("实现原则：默认路径稳，增强路径可选；作业可复现，真实部署也有升级接口。", { x: 1.0, y: 6.12, w: 11.1, h: 0.26, ...font(15.5, C.ink, true), fit: "shrink" });
+  slide.addText("实现原则：默认路径稳，增强路径可选；本地可复现，真实部署也有升级接口。", { x: 1.0, y: 6.12, w: 11.1, h: 0.26, ...font(15.5, C.ink, true), fit: "shrink" });
   addNotes(slide, 7, "Embedding 与本地向量数据库", [
     "默认使用 HashingEmbeddingModel，维度 256",
     "可选使用 BGE/SentenceTransformer embedding",
     "向量库支持本地 JSONL、FAISS adapter 和 Chroma adapter",
-    "默认不强制下载模型，保证作业能稳定复现",
-  ], "这一页说明 embedding 和向量库的升级。为了保证老师本地一定能跑，默认仍使用 hashing embedding 和 JSONL 本地向量库；为了回应后续扩展要求，我已经加入 SentenceTransformerEmbeddingModel，可以使用 BGE 小模型，也加入 FAISS 和 Chroma 的可选适配器。这样项目不是只停留在 demo，而是保留了课程可复现路径和真实部署升级路径。");
+    "默认不强制下载模型，保证系统能稳定复现",
+  ], "这一页说明 embedding 和向量库的升级。为了保证本地环境稳定运行，默认仍使用 hashing embedding 和 JSONL 本地向量库；为了回应后续扩展要求，已经加入 SentenceTransformerEmbeddingModel，可以使用 BGE 小模型，也加入 FAISS 和 Chroma 的可选适配器。这样项目不是只停留在 demo，而是保留了本地复现路径和真实部署升级路径。");
 }
 
 // Slide 8

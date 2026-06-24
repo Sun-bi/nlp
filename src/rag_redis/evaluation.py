@@ -1,4 +1,4 @@
-"""Quantitative RAG evaluation for coursework reporting."""
+"""Quantitative RAG evaluation utilities."""
 
 from __future__ import annotations
 

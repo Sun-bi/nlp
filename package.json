@@ -1,8 +1,8 @@
 {
-  "name": "redis-rag-coursework",
+  "name": "redis-rag-system",
   "version": "1.0.0",
   "private": true,
-  "description": "Redis-domain RAG coursework presentation generator",
+  "description": "Redis-domain RAG presentation generator",
   "scripts": {
     "slides": "node scripts/create_pptx.js"
   },

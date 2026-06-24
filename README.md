@@ -1,10 +1,10 @@
 # Redis 垂直领域 RAG 问答系统
 
-本仓库是“基于 RAG 的垂直领域深度问答系统构建”课程作业的完整提交版本。项目围绕 Redis 官方文档构建私有知识库，实现文档清洗、技术词分块、哈希嵌入、本地向量索引、关键词和语义混合检索、二阶段重排序、带引用答案生成、引用检查和量化评估。
+本项目围绕 Redis 官方文档构建垂直领域 RAG 问答系统，实现文档清洗、技术词分块、哈希嵌入、本地向量索引、关键词和语义混合检索、二阶段重排序、带引用答案生成、引用检查和量化评估。
 
 ## 1. 提交材料
 
-| 老师要求 | 本仓库对应文件 |
+| 项目内容 | 对应文件 |
 |---|---|
 | 完整代码仓库 | `src/rag_redis/`、`infer.py`、`build_index.py`、`evaluate.py`、`compare_retrieval.py`、`scripts/` |
 | 清晰的 `README.md` | 当前文件 |
@@ -56,7 +56,7 @@ cd /Users/sun/deeplearning/nlp
 python3 -m pip install -r requirements.txt
 ```
 
-默认推理链路不需要下载大模型，也不需要 GPU。系统默认使用本地哈希嵌入和本地索引文件，方便在课堂或验收电脑上复现。
+默认推理链路不需要下载大模型，也不需要 GPU。系统默认使用本地哈希嵌入和本地索引文件，方便在普通运行环境中复现。
 
 可选增强依赖已经写在 `requirements.txt` 注释中。如果要运行神经嵌入、FAISS 或 Chroma，可以手动安装：
 
@@ -118,8 +118,8 @@ python3 build_index.py \
 当前官方文档知识库包含：
 
 - `data/raw/redis_official_docs.jsonl`：14 篇 Redis 官方文档主题
-- `data/index_official/chunks.jsonl`：196 个检索片段
-- `data/index_official/vectors.jsonl`：196 条本地向量记录
+- `data/index_official/chunks.jsonl`：166 个检索片段
+- `data/index_official/vectors.jsonl`：166 条本地向量记录
 
 ## 6. 系统方案
 

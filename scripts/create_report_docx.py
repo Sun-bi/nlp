@@ -111,7 +111,7 @@ def add_cover(doc: Document) -> None:
 
     subtitle = doc.add_paragraph()
     subtitle.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run = subtitle.add_run("课程作业报告 | 私有知识库、混合检索、轻量重排序与三维量化评估")
+    run = subtitle.add_run("项目报告 | 私有知识库、混合检索、轻量重排序与三维量化评估")
     set_run_font(run, size=11.5, color=MUTED)
 
     meta = doc.add_paragraph()
@@ -243,7 +243,7 @@ def add_figures(doc: Document) -> None:
 def add_footer(doc: Document) -> None:
     footer = doc.sections[0].footer.paragraphs[0]
     footer.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run = footer.add_run("Redis-RAG 课程作业报告")
+    run = footer.add_run("Redis-RAG 项目报告")
     set_run_font(run, size=8.5, color=MUTED)
 
 

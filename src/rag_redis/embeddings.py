@@ -20,7 +20,7 @@ class EmbeddingModel(Protocol):
 
 
 class HashingEmbeddingModel:
-    """A deterministic local embedding model for reproducible coursework runs.
+    """A deterministic local embedding model for reproducible runs.
 
     It maps Redis-aware tokens into a fixed dimensional vector using signed
     hashing. The README documents how to swap this for BGE/SentenceTransformer
@@ -51,7 +51,7 @@ class HashingEmbeddingModel:
 class SentenceTransformerEmbeddingModel:
     """Optional BGE/SentenceTransformer embedding adapter.
 
-    The default coursework path intentionally does not require this dependency.
+    The default local path intentionally does not require this dependency.
     Install `sentence-transformers` and pass a BGE model name to enable it.
     """
 

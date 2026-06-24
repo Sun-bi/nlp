@@ -61,16 +61,27 @@ class TextExtractor(HTMLParser):
         seen = set()
         cleaned = []
         for part in self.parts:
+            if is_page_metadata(part):
+                continue
             if part not in seen:
                 seen.add(part)
                 cleaned.append(part)
         return "\n".join(cleaned)
 
 
+def is_page_metadata(text: str) -> bool:
+    stripped = text.strip()
+    return (
+        stripped.startswith("{")
+        and '"duplicateOf"' in stripped
+        and '"tableOfContents"' in stripped
+    )
+
+
 def fetch_page(url: str, timeout: int = 30) -> str:
     request = urllib.request.Request(
         url,
-        headers={"User-Agent": "redis-rag-coursework/1.0"},
+        headers={"User-Agent": "redis-rag-system/1.0"},
     )
     with urllib.request.urlopen(request, timeout=timeout) as response:
         return response.read().decode("utf-8", errors="ignore")

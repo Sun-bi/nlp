@@ -1,4 +1,4 @@
-# Redis-RAG 作业提交清单
+# Redis-RAG 项目提交清单
 
 ## 必交文件
 
@@ -28,7 +28,7 @@ python3 -m pip install -r requirements.txt
 PYTHONPATH=src python3 -m pytest tests -q
 ```
 
-## 交作业前不要放进去
+## 提交前不要放进去
 
 - `.DS_Store`
 - `.pytest_cache/`
